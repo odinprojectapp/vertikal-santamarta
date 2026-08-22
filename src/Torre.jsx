@@ -125,11 +125,17 @@ function LineaVida({ material }) {
 }
 
 /* ---------- EL TÉCNICO ----------
-   Pose de rápel real: sentado en el arnés, piernas flexionadas
-   apoyadas contra la estructura. No es una figura colgando recta. */
-function Tecnico({ progreso, cuerpo, casco, arnes, piel }) {
+   Vestimenta tomada del logo oficial JFC VERTIKAL SAS: casco
+   naranja, camisa blanca de manga oscura, arnés negro, guantes
+   verde lima y pantalón caqui.
+
+   Ergonomía: proporciones de 7,5 cabezas (canon humano real),
+   articulaciones marcadas en hombro, codo y rodilla, y pose de
+   rápel en L — el cuerpo forma ángulo recto con las piernas
+   apoyadas en el acero, que es la postura de descenso correcta. */
+function Tecnico({ progreso, m }) {
   const g = useRef()
-  const brazo = useRef()
+  const brazoFreno = useRef()
   const suave = useRef(0)
 
   useFrame((state, delta) => {
@@ -139,58 +145,124 @@ function Tecnico({ progreso, cuerpo, casco, arnes, piel }) {
     const y = ALTO_TOTAL * (1 - p) - 1.5
 
     if (!g.current) return
-    g.current.position.set(LINEA_X, y, lineaZ(y) - 0.75)
+    g.current.position.set(LINEA_X, y, lineaZ(y) - 0.62)
     g.current.rotation.y = Math.PI
 
-    /* Balanceo sutil: es un descenso controlado, no un péndulo. */
     const t = state.clock.elapsedTime
-    g.current.rotation.z = Math.sin(t * 1.1) * 0.045
-    if (brazo.current) brazo.current.rotation.x = -0.5 + Math.sin(t * 1.6) * 0.12
+    /* Balanceo mínimo: descenso controlado, no un péndulo. */
+    g.current.rotation.z = Math.sin(t * 0.9) * 0.035
+    /* El brazo de freno gobierna la velocidad: se mueve porque
+       está trabajando, no por decoración. */
+    if (brazoFreno.current) {
+      brazoFreno.current.rotation.x = 0.55 + Math.sin(t * 1.4) * 0.16
+    }
   })
 
-  return (
-    <group ref={g}>
-      <mesh material={casco} position={[0, 1.62, 0]}>
-        <sphereGeometry args={[0.3, 14, 12, 0, Math.PI * 2, 0, Math.PI * 0.62]} />
+  /* Brazo: hombro -> codo -> antebrazo -> guante. */
+  const Brazo = ({ lado, refHombro, rotHombro, rotCodo }) => (
+    <group position={[lado * 0.22, 1.28, 0]} ref={refHombro} rotation={rotHombro}>
+      <mesh material={m.manga} position={[0, -0.17, 0]}>
+        <capsuleGeometry args={[0.072, 0.26, 4, 8]} />
       </mesh>
-      <mesh material={piel} position={[0, 1.5, 0]}>
-        <sphereGeometry args={[0.245, 12, 12]} />
-      </mesh>
-      <mesh material={cuerpo} position={[0, 1.02, 0.06]} rotation={[0.28, 0, 0]}>
-        <capsuleGeometry args={[0.27, 0.68, 4, 10]} />
-      </mesh>
-      <mesh material={arnes} position={[0, 1.12, 0.03]} rotation={[0.28, 0, 0]}>
-        <torusGeometry args={[0.3, 0.055, 8, 16]} />
-      </mesh>
-      <mesh material={arnes} position={[0, 0.62, 0]} rotation={[Math.PI / 2, 0, 0]}>
-        <torusGeometry args={[0.31, 0.07, 8, 16]} />
-      </mesh>
-      <mesh material={arnes} position={[0, 0.62, -0.34]}>
-        <boxGeometry args={[0.17, 0.17, 0.12]} />
-      </mesh>
-
-      {[-1, 1].map((s) => (
-        <group key={s} position={[s * 0.18, 0.55, 0]}>
-          <mesh material={cuerpo} position={[0, -0.3, -0.26]} rotation={[-0.95, 0, 0]}>
-            <capsuleGeometry args={[0.115, 0.5, 4, 8]} />
-          </mesh>
-          <mesh material={cuerpo} position={[0, -0.5, -0.82]} rotation={[-0.15, 0, 0]}>
-            <capsuleGeometry args={[0.1, 0.5, 4, 8]} />
-          </mesh>
-          <mesh material={arnes} position={[0, -0.72, -1.05]}>
-            <boxGeometry args={[0.19, 0.14, 0.3]} />
-          </mesh>
-        </group>
-      ))}
-
-      <group ref={brazo} position={[0.3, 1.16, 0]}>
-        <mesh material={cuerpo} position={[0, -0.26, -0.1]} rotation={[-0.5, 0, 0]}>
-          <capsuleGeometry args={[0.095, 0.44, 4, 8]} />
+      <group position={[0, -0.34, 0]} rotation={rotCodo}>
+        <mesh material={m.manga} position={[0, -0.16, 0]}>
+          <capsuleGeometry args={[0.062, 0.24, 4, 8]} />
+        </mesh>
+        <mesh material={m.guante} position={[0, -0.33, 0]}>
+          <sphereGeometry args={[0.075, 8, 8]} />
         </mesh>
       </group>
-      <mesh material={cuerpo} position={[-0.3, 0.92, -0.16]} rotation={[-0.75, 0, 0]}>
-        <capsuleGeometry args={[0.095, 0.46, 4, 8]} />
+    </group>
+  )
+
+  /* Pierna: cadera -> muslo -> rodilla -> pantorrilla -> bota. */
+  const Pierna = ({ lado }) => (
+    <group position={[lado * 0.13, 0.72, 0]}>
+      <group rotation={[-1.32, 0, lado * 0.16]}>
+        <mesh material={m.pantalon} position={[0, -0.22, 0]}>
+          <capsuleGeometry args={[0.093, 0.34, 4, 8]} />
+        </mesh>
+        <group position={[0, -0.45, 0]} rotation={[0.62, 0, 0]}>
+          <mesh material={m.pantalon} position={[0, -0.2, 0]}>
+            <capsuleGeometry args={[0.077, 0.32, 4, 8]} />
+          </mesh>
+          {/* bota apoyada contra el montante */}
+          <mesh material={m.arnes} position={[0, -0.42, -0.06]}
+            rotation={[0.3, 0, 0]}>
+            <boxGeometry args={[0.14, 0.11, 0.26]} />
+          </mesh>
+        </group>
+      </group>
+    </group>
+  )
+
+  return (
+    <group ref={g} scale={0.98}>
+      {/* ---- cabeza ---- */}
+      <mesh material={m.piel} position={[0, 1.62, 0.015]}>
+        <sphereGeometry args={[0.113, 14, 14]} />
       </mesh>
+      {/* casco naranja con ala */}
+      <mesh material={m.casco} position={[0, 1.655, 0]}>
+        <sphereGeometry args={[0.132, 16, 14, 0, Math.PI * 2, 0, Math.PI * 0.56]} />
+      </mesh>
+      <mesh material={m.casco} position={[0, 1.632, 0.03]} rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[0.126, 0.021, 8, 18]} />
+      </mesh>
+      {/* barbuquejo: el casco va sujeto, como exige la norma */}
+      <mesh material={m.arnes} position={[0, 1.545, 0.015]} rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[0.108, 0.012, 6, 16]} />
+      </mesh>
+
+      {/* ---- cuello y torso ---- */}
+      <mesh material={m.piel} position={[0, 1.5, 0.01]}>
+        <capsuleGeometry args={[0.045, 0.05, 4, 8]} />
+      </mesh>
+      {/* El torso se inclina hacia atrás: el peso cuelga del arnés */}
+      <group rotation={[0.34, 0, 0]}>
+        <mesh material={m.camisa} position={[0, 1.24, 0.05]}>
+          <capsuleGeometry args={[0.176, 0.34, 6, 12]} />
+        </mesh>
+        {/* cintas del arnés sobre el pecho */}
+        <mesh material={m.arnes} position={[0.075, 1.26, -0.13]} rotation={[0, 0, -0.34]}>
+          <boxGeometry args={[0.042, 0.4, 0.03]} />
+        </mesh>
+        <mesh material={m.arnes} position={[-0.075, 1.26, -0.13]} rotation={[0, 0, 0.34]}>
+          <boxGeometry args={[0.042, 0.4, 0.03]} />
+        </mesh>
+        {/* bandera de Colombia en la manga, como en el logo */}
+        <mesh material={m.casco} position={[0.178, 1.32, 0.02]}>
+          <boxGeometry args={[0.012, 0.05, 0.07]} />
+        </mesh>
+      </group>
+
+      {/* ---- arnés de cintura + punto de anclaje ---- */}
+      <mesh material={m.arnes} position={[0, 1.0, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[0.166, 0.038, 8, 18]} />
+      </mesh>
+      {/* perneras */}
+      {[-1, 1].map((s) => (
+        <mesh key={s} material={m.arnes} position={[s * 0.12, 0.86, 0]}
+          rotation={[Math.PI / 2, 0, s * 0.2]}>
+          <torusGeometry args={[0.088, 0.026, 6, 14]} />
+        </mesh>
+      ))}
+      {/* mosquetón y descensor sobre la línea de vida */}
+      <mesh material={m.cinta} position={[0, 1.0, -0.2]}>
+        <torusGeometry args={[0.055, 0.016, 8, 14]} />
+      </mesh>
+      <mesh material={m.arnes} position={[0, 1.02, -0.29]}>
+        <boxGeometry args={[0.1, 0.13, 0.07]} />
+      </mesh>
+
+      {/* ---- extremidades ---- */}
+      <Pierna lado={-1} />
+      <Pierna lado={1} />
+      {/* brazo de freno: sujeta la cuerda por debajo de la cadera */}
+      <Brazo lado={1} refHombro={brazoFreno}
+        rotHombro={[0.55, 0, -0.3]} rotCodo={[0.5, 0, 0]} />
+      {/* brazo guía: hacia la línea, por encima del descensor */}
+      <Brazo lado={-1} rotHombro={[-0.62, 0, 0.34]} rotCodo={[-0.5, 0, 0]} />
     </group>
   )
 }
@@ -202,7 +274,7 @@ function Tecnico({ progreso, cuerpo, casco, arnes, piel }) {
 function Camara({ progreso, reduce }) {
   const { camera } = useThree()
   const suave = useRef(0)
-  const mira = useRef(new THREE.Vector3(0, ALTO_TOTAL, 0))
+  const mira = useRef(new THREE.Vector3(0, ALTO_TOTAL, lineaZ(ALTO_TOTAL)))
   const objetivo = useRef(new THREE.Vector3())
 
   useFrame((_, delta) => {
@@ -220,22 +292,34 @@ function Camara({ progreso, reduce }) {
     /* El ángulo gira ~140° durante el descenso. La distancia se
        acorta solo un poco: acercarse demasiado metía las barras
        en primer plano y tapaba al técnico. */
-    const ang = THREE.MathUtils.lerp(0.5, 2.9, p)
-    /* La distancia CRECE con el descenso porque la torre se
-       ensancha hacia la base: manteniéndola fija, al final la
-       cámara quedaba entre los montantes y solo se veían barras.
-       Se separa además del radio real a esa altura. */
-    const dist = radioEn(yTec) + THREE.MathUtils.lerp(14, 30, p)
-    const alto = THREE.MathUtils.lerp(4, 6, p)
+    const ang = THREE.MathUtils.lerp(-0.75, 1.05, p)
+    /* Cámara CERCA del técnico: él es el sujeto, la torre pasa a
+       ser el entorno que se desplaza detrás. La distancia se mide
+       desde la línea de vida, no desde el eje de la torre, así el
+       encuadre no cambia aunque la estructura se ensanche. */
+    /* 9 u: el técnico ocupa buena parte del alto del cuadro y la
+       celosía sigue visible detrás como entorno. A 4-5 u la
+       cámara se salía de la estructura y quedaba mirando al vacío. */
+    const dist = 9 + Math.sin(p * Math.PI) * 1.5
+    const alto = THREE.MathUtils.lerp(1.6, 1.0, p)
 
-    camera.position.set(Math.sin(ang) * dist, yTec + alto, Math.cos(ang) * dist)
+    /* Orbita en un arco frontal acotado (no da la vuelta entera):
+       la línea de vida está en la cara +Z, así que rodearla por
+       detrás dejaría al técnico oculto tras la estructura. */
+    const zLinea = lineaZ(yTec)
+    camera.position.set(
+      Math.sin(ang) * dist,
+      yTec + alto,
+      zLinea + Math.cos(ang) * dist
+    )
 
     /* El técnico se encuadra a la derecha del texto: el objetivo
        se desplaza en X para dejarle la izquierda a la tipografía. */
-    /* El objetivo se desplaza a la IZQUIERDA del eje, lo que
-       empuja al técnico hacia la DERECHA del encuadre y deja la
-       izquierda libre para la tipografía. */
-    objetivo.current.set(6.5, yTec + 1.2, 0)
+    /* Desplazado en X para que el técnico caiga a la derecha del
+       cuadro y la tipografía tenga libre la mitad izquierda. */
+    /* Un objetivo muy desplazado en X empuja al técnico al borde
+       derecho del encuadre, que es la zona libre de tipografía. */
+    objetivo.current.set(-6.5, yTec + 0.6, zLinea)
     mira.current.lerp(objetivo.current, 0.12)
     camera.lookAt(mira.current)
   })
@@ -248,10 +332,16 @@ function Escena({ progreso, reduce }) {
   const mats = useMemo(() => ({
     acero: new THREE.MeshStandardMaterial({ color: '#9FAAB6', roughness: 0.5, metalness: 0.75 }),
     cable: new THREE.MeshStandardMaterial({ color: '#D8DEE4', roughness: 0.35, metalness: 0.85 }),
-    cuerpo: new THREE.MeshStandardMaterial({ color: '#1F5FA8', roughness: 0.82 }),
-    casco: new THREE.MeshStandardMaterial({ color: '#F2C300', roughness: 0.42, metalness: 0.15 }),
-    arnes: new THREE.MeshStandardMaterial({ color: '#23262A', roughness: 0.75 }),
-    piel: new THREE.MeshStandardMaterial({ color: '#B8895E', roughness: 0.9 }),
+    /* Paleta tomada del logo oficial JFC VERTIKAL SAS: camisa
+       blanca, casco naranja, pantalón caqui, guantes verde lima. */
+    camisa: new THREE.MeshStandardMaterial({ color: '#F0F2F4', roughness: 0.86 }),
+    manga: new THREE.MeshStandardMaterial({ color: '#1A1D21', roughness: 0.85 }),
+    pantalon: new THREE.MeshStandardMaterial({ color: '#B39770', roughness: 0.9 }),
+    casco: new THREE.MeshStandardMaterial({ color: '#E08A16', roughness: 0.35, metalness: 0.2 }),
+    guante: new THREE.MeshStandardMaterial({ color: '#B4E01E', roughness: 0.7 }),
+    arnes: new THREE.MeshStandardMaterial({ color: '#1B1E22', roughness: 0.72 }),
+    cinta: new THREE.MeshStandardMaterial({ color: '#2E7DD1', roughness: 0.7 }),
+    piel: new THREE.MeshStandardMaterial({ color: '#C89268', roughness: 0.9 }),
     baliza: new THREE.MeshStandardMaterial({
       color: '#E5342A', emissive: '#E5342A', emissiveIntensity: 1.6, roughness: 0.5,
     }),
@@ -261,7 +351,7 @@ function Escena({ progreso, reduce }) {
 
   return (
     <>
-      <fog attach="fog" args={['#12171C', 40, 220]} />
+      <fog attach="fog" args={['#12171C', 22, 165]} />
       <color attach="background" args={['#12171C']} />
 
       <hemisphereLight args={['#9FB4C8', '#0E1216', 2.2]} />
@@ -271,8 +361,7 @@ function Escena({ progreso, reduce }) {
       <Celosia material={mats.acero} />
       <Antenas acero={mats.acero} baliza={mats.baliza} />
       <LineaVida material={mats.cable} />
-      <Tecnico progreso={progreso} cuerpo={mats.cuerpo}
-        casco={mats.casco} arnes={mats.arnes} piel={mats.piel} />
+      <Tecnico progreso={progreso} m={mats} />
 
       <Camara progreso={progreso} reduce={reduce} />
     </>

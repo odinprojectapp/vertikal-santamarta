@@ -54,6 +54,12 @@ Un **técnico con casco, arnés y equipo** desciende por esa línea a lo
 largo del scroll, en pose de rápel real: sentado en el arnés, piernas
 flexionadas apoyadas contra la estructura.
 
+**Su vestimenta viene del logo oficial JFC VERTIKAL SAS**: casco
+naranja con barbuquejo, camisa blanca de manga oscura, arnés negro de
+pecho y cintura, guantes verde lima, pantalón caqui y bandera de
+Colombia en la manga. Proporciones de 7,5 cabezas (canon humano) con
+articulaciones en hombro, codo y rodilla.
+
 La cámara lo sigue **desde fuera**, girando ~140° alrededor de la torre
 durante el recorrido y variando distancia y altura. El movimiento se
 lee como una grúa de cine, no como una cámara clavada.
