@@ -53,6 +53,19 @@ const REFERENTES = [
   { n: 'Constructora Jiménez',  f: 'jimenez.png',     d: 'Constructora' },
 ]
 
+/* ============ VALORES CORPORATIVOS ============
+   Textuales de su página valores-corporativos. Las frases están
+   dentro de imágenes en su sitio, así que Google no las indexa:
+   aquí van como texto real. */
+const VALORES = [
+  { ix: '01', t: 'Trabajo en equipo', d: 'Potenciamos el esfuerzo.' },
+  { ix: '02', t: 'Equilibrio',        d: 'Establecemos relaciones de ganar-ganar.' },
+  { ix: '03', t: 'Transparencia',     d: 'Trabajo honesto y apasionado.' },
+  { ix: '04', t: 'Oportunidad',       d: 'La inmediatez en nuestro servicio es el valor del tiempo.' },
+  { ix: '05', t: 'Mística',           d: 'Realizamos nuestro trabajo bien desde el principio, con la convicción de hacer lo mejor de manera segura.' },
+  { ix: '06', t: 'Respeto',           d: 'Entendemos tus necesidades, las apropiamos como nuestras.' },
+]
+
 const CIFRAS = [
   { b: '2009', s: 'Operando desde el 30 de diciembre', ok: true },
   { b: '04', s: 'Departamentos: Magdalena, Cesar, Atlántico, La Guajira', ok: true },
@@ -207,6 +220,27 @@ export default function App() {
         })
       })
 
+      /* --- Valores: filas escalonadas y línea que se traza ---
+             La línea se dibuja con scaleX, no con width: animar el
+             ancho dispara recálculo de layout en cada frame. */
+      /* Un trigger por fila, no uno global sobre la lista: con el
+         pin del panel de riesgo por encima, las marcas calculadas
+         sobre un contenedor alto quedaban fuera de rango y las
+         filas no llegaban a dispararse nunca. */
+      gsap.utils.toArray('.vrow').forEach((fila) => {
+        const tl = gsap.timeline({
+          scrollTrigger: { trigger: fila, start: 'top 88%' },
+        })
+        tl.from(fila.querySelectorAll('.vix, h3, p'), {
+          y: reduce ? 0 : 22, opacity: 0,
+          duration: reduce ? 0.4 : 0.65,
+          stagger: 0.06, ease: 'power3.out',
+        })
+        tl.to(fila.querySelector('.vline'), {
+          scaleX: 1, duration: reduce ? 0.3 : 0.8, ease: 'power2.inOut',
+        }, reduce ? 0 : 0.15)
+      })
+
       /* --- Tarjetas escalonadas --- */
       gsap.from('.layer-card', {
         y: reduce ? 0 : 34, opacity: 0,
@@ -307,6 +341,29 @@ export default function App() {
             </article>
           ))}
         </div>
+      </section>
+
+      {/* ---------- VALORES ---------- */}
+      <section className="chapter wrap valores" id="valores">
+        <div className="chapter-head reveal">
+          <span className="eyebrow">Valores corporativos</span>
+          <h2>Seis principios,<br />no un cartel</h2>
+          <p>
+            En trabajo de alto riesgo los valores no son decoración: son
+            el procedimiento que evita que alguien se caiga.
+          </p>
+        </div>
+
+        <ol className="vlist">
+          {VALORES.map((v) => (
+            <li className="vrow" key={v.ix}>
+              <span className="vix mono">{v.ix}</span>
+              <h3>{v.t}</h3>
+              <p>{v.d}</p>
+              <span className="vline" aria-hidden="true" />
+            </li>
+          ))}
+        </ol>
       </section>
 
       {/* ---------- REFERENTES ---------- */}

@@ -34,6 +34,7 @@ Su negocio, convertido en interfaz.
 | **Lenis** | Inercia de scroll cinematográfica, sincronizada al ticker de GSAP |
 | **Revelado por línea** | El titular entra línea a línea con máscara de overflow |
 | **Stagger** | Tarjetas escalonadas a 90 ms |
+| **Filas escalonadas** | Valores: cada fila con su propio trigger; la línea inferior se traza con `scaleX` |
 | **Marquesina infinita** | Referentes en cinta continua movida por `requestAnimationFrame`, doble copia sin costura |
 
 ## Stack
@@ -98,6 +99,21 @@ npm run build
 repositorio cambia de nombre, hay que ajustarlo ahí.
 
 ---
+
+## Valores corporativos — textuales
+
+Los seis valores y sus frases salen de su página `valores-corporativos`.
+En su sitio están **dentro de imágenes**, así que Google no los indexa
+y un lector de pantalla no los lee. Aquí van como texto real.
+
+| # | Valor | Frase (textual) |
+|---|---|---|
+| 01 | Trabajo en equipo | Potenciamos el esfuerzo |
+| 02 | Equilibrio | Establecemos relaciones de ganar-ganar |
+| 03 | Transparencia | Trabajo honesto y apasionado |
+| 04 | Oportunidad | La inmediatez en nuestro servicio es el valor del tiempo |
+| 05 | Mística | Realizamos nuestro trabajo bien desde el principio, con la convicción de hacer lo mejor de manera segura |
+| 06 | Respeto | Entendemos tus necesidades, las apropiamos como nuestras |
 
 ## Referentes — todos verificados
 
