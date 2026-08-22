@@ -221,10 +221,12 @@ function Camara({ progreso, reduce }) {
        acorta solo un poco: acercarse demasiado metía las barras
        en primer plano y tapaba al técnico. */
     const ang = THREE.MathUtils.lerp(0.5, 2.9, p)
-    /* 22 u: lo bastante cerca para leer al técnico como persona,
-       lo bastante lejos para que la celosía no llene el cuadro. */
-    const dist = 22 - Math.sin(p * Math.PI) * 4
-    const alto = THREE.MathUtils.lerp(4, 2, p)
+    /* La distancia CRECE con el descenso porque la torre se
+       ensancha hacia la base: manteniéndola fija, al final la
+       cámara quedaba entre los montantes y solo se veían barras.
+       Se separa además del radio real a esa altura. */
+    const dist = radioEn(yTec) + THREE.MathUtils.lerp(14, 30, p)
+    const alto = THREE.MathUtils.lerp(4, 6, p)
 
     camera.position.set(Math.sin(ang) * dist, yTec + alto, Math.cos(ang) * dist)
 
