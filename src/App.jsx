@@ -123,33 +123,76 @@ const CIFRAS = [
 ]
 
 /* ---------- Iconos de servicio ----------
-   Trazo, no relleno: heredan currentColor y se ven nítidos a
-   cualquier tamaño sin cargar una librería de iconos. */
+   Cada uno es el equipo real del servicio, no una metáfora. Se
+   dibujan verticales y estrechos —como el equipo de alturas— en
+   vez de encajados en un cuadrado, que es lo que los volvía
+   irreconocibles. Dos pesos de trazo dan jerarquía. */
 function Icono({ tipo }) {
-  const p = { fill: 'none', stroke: 'currentColor', strokeWidth: 1.6,
+  const A = { fill: 'none', stroke: 'currentColor', strokeWidth: 1.6,
     strokeLinecap: 'round', strokeLinejoin: 'round' }
+  const B = { ...A, strokeWidth: 1.1, opacity: 0.5 }
+
   const svg = {
-    /* arnés: cinturón con perneras y anclaje dorsal */
-    arnes: <><circle cx="12" cy="4.2" r="2.1" {...p} />
-      <path d="M12 6.3v4.4M7.4 9.2 12 10.7l4.6-1.5" {...p} />
-      <path d="M6.8 12.4h10.4M8.2 12.4l-1.4 7M15.8 12.4l1.4 7" {...p} />
-      <path d="M12 10.7v3.1" {...p} /></>,
-    /* espacios confinados: boca de pozo con descenso */
-    escudo: <><ellipse cx="12" cy="5.4" rx="7" ry="2.4" {...p} />
-      <path d="M5 5.4v3.1c0 1.3 3.1 2.4 7 2.4s7-1.1 7-2.4V5.4" {...p} />
-      <path d="M12 11v9.4M9.4 20.4h5.2" {...p} />
-      <circle cx="12" cy="15.2" r="1.5" {...p} /></>,
-    /* grúa / labores en altura */
-    grua: <><path d="M4 20.4h16M6.4 20.4V4.6h11.2" {...p} />
-      <path d="M6.4 4.6 17.6 9.4M17.6 4.6v4.8" {...p} />
-      <path d="M13.4 6.4v4.2M11.6 10.6h3.6v3.4h-3.6z" {...p} /></>,
-    /* línea de vida vertical con anclajes */
-    linea: <><path d="M12 3.2v17.6" {...p} />
-      <circle cx="12" cy="4.4" r="1.5" {...p} />
-      <circle cx="12" cy="19.6" r="1.5" {...p} />
-      <path d="M7.6 8.6h8.8M7.6 12h8.8M7.6 15.4h8.8" {...p} /></>,
+    /* FORMACIÓN — casco con barbuquejo: es lo que distingue a una
+       persona certificada y se reconoce al instante. */
+    arnes: <>
+      <path d="M8.5 27c0-8.6 7-15.5 15.5-15.5S39.5 18.4 39.5 27" {...A} />
+      <path d="M6 27h36" {...A} />
+      <path d="M24 11.5V7.5" {...B} />
+      <path d="M17.5 27c0-7.4 2.9-13.4 6.5-13.4S30.5 19.6 30.5 27" {...B} />
+      <path d="M11.5 30.5c2 5.6 6.9 9.5 12.5 9.5s10.5-3.9 12.5-9.5" {...A} />
+      <path d="M18.5 38.4l1.4 3.4M29.5 38.4l-1.4 3.4" {...B} />
+      <path d="M19.9 41.8h8.2" {...B} />
+    </>,
+
+    /* GERENCIA DEL RIESGO — arnés de cuerpo entero visto de frente:
+       tirantes en Y, cinturón y perneras, con el anclaje dorsal
+       marcado. Un mosquetón reducido a trazo cerrado se leía como
+       un ratón de ordenador; el arnés tiene silueta inconfundible. */
+    escudo: <>
+      <path d="M17 8.5v6.5M31 8.5v6.5" {...A} />
+      <path d="M17 15l7 6 7-6" {...A} />
+      <circle cx="24" cy="23.4" r="2.4" {...A} />
+      <path d="M12.5 25.5h23" {...A} />
+      <path d="M12.5 25.5v3.5M35.5 25.5v3.5" {...B} />
+      <path d="M15.5 29l-1.5 12M32.5 29l1.5 12" {...A} />
+      <path d="M14 41h5M29 41h5" {...A} />
+      <path d="M24 25.9v4.6" {...B} />
+      <path d="M19.5 30.5h9" {...B} />
+    </>,
+
+    /* LABORES — fachada con plataforma suspendida: rejilla de
+       ventanas y la góndola colgada de sus dos cables. Es
+       literalmente el lavado de fachadas que ofrecen. */
+    grua: <>
+      <path d="M6 6.5h36" {...A} />
+      <path d="M9.5 12.5h20v26h-20z" {...A} />
+      <path d="M9.5 21h20M9.5 29.5h20M19.5 12.5v26" {...B} />
+      <path d="M34 6.5v18M41 6.5v18" {...A} />
+      <path d="M31.5 24.5h12v7h-12z" {...A} />
+      <path d="M31.5 28h12" {...B} />
+      <path d="M6 41.5h36" {...A} />
+    </>,
+
+    /* SISTEMAS DE INGENIERÍA — cable tensado entre dos anclajes
+       estructurales con el carro anticaídas montado. */
+    linea: <>
+      <path d="M11 8h26M11 40h26" {...A} />
+      <path d="M14 8v-3.5M34 8v-3.5M14 43.5V40M34 43.5V40" {...B} />
+      <path d="M24 8v32" {...A} />
+      <rect x="19.6" y="20" width="8.8" height="8" rx="1.5" {...A} />
+      <path d="M28.4 24h5.2" {...A} />
+      <circle cx="35.6" cy="24" r="2.1" {...A} />
+      <path d="M21.4 22.4h1.8M21.4 25.6h1.8" {...B} />
+      <path d="M17 14h14M17 34h14" {...B} />
+    </>,
   }[tipo]
-  return <svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true">{svg}</svg>
+
+  return (
+    <svg viewBox="0 0 48 48" width="34" height="34" aria-hidden="true">
+      {svg}
+    </svg>
+  )
 }
 
 /* ---------- Servicios: acordeón en columna ----------
