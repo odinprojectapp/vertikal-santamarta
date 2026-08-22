@@ -34,7 +34,7 @@ Su negocio, convertido en interfaz.
 | **Lenis** | Inercia de scroll cinematográfica, sincronizada al ticker de GSAP |
 | **Revelado por línea** | El titular entra línea a línea con máscara de overflow |
 | **Stagger** | Tarjetas escalonadas a 90 ms |
-| **Marquesina infinita** | Referentes en cinta continua, doble copia sin costura |
+| **Marquesina infinita** | Referentes en cinta continua movida por `requestAnimationFrame`, doble copia sin costura |
 
 ## Stack
 
@@ -158,6 +158,11 @@ confirmar con ellos.
 
 - `prefers-reduced-motion`: se retiran parallax, pinning y Lenis; se
   conservan los fundidos. Apagar todo dejaría contenido invisible.
+- La marquesina de referentes **no se detiene** con esa preferencia:
+  baja a menos de la mitad de velocidad. Se mueve con
+  `requestAnimationFrame`, no con animación CSS, porque Chrome congela
+  las animaciones CSS cuando el sistema pide movimiento reducido — y
+  al detenerse aparecía una barra de scroll manual, que era peor.
 - Contraste AA en todo el texto.
 - Foco visible en amarillo sobre fondo oscuro.
 - SVG decorativo marcado `aria-hidden`.

@@ -443,6 +443,9 @@ img, svg { display: block; max-width: 100%; }
 
 .marquee {
   margin-block-start: clamp(38px, 6vh, 64px);
+  /* hidden, no auto: la cinta se mueve sola, nunca debe aparecer
+     una barra de desplazamiento manual. */
+  overflow: hidden;
   /* Los bordes se desvanecen: la cinta parece continuar más allá
      del viewport en vez de cortarse en seco. */
   -webkit-mask-image: linear-gradient(90deg,
@@ -450,16 +453,13 @@ img, svg { display: block; max-width: 100%; }
   mask-image: linear-gradient(90deg,
     transparent 0, #000 9%, #000 91%, transparent 100%);
 }
-.marquee-track { display: flex; width: max-content; }
-.marquee-set {
+.marquee-track {
   display: flex;
-  animation: desfile 46s linear infinite;
+  width: max-content;
+  /* El transform lo escribe JS en cada frame. */
+  will-change: transform;
 }
-@keyframes desfile {
-  from { transform: translate3d(0, 0, 0); }
-  to   { transform: translate3d(-100%, 0, 0); }
-}
-.marquee:hover .marquee-set { animation-play-state: paused; }
+.marquee-set { display: flex; }
 
 .ref {
   flex: 0 0 auto;
@@ -508,13 +508,10 @@ img, svg { display: block; max-width: 100%; }
   .ref:hover img { filter: none; background: #fff; }
 }
 
-/* Con movimiento reducido la cinta se detiene y pasa a rejilla:
-   un bucle infinito es exactamente lo que hay que suprimir. */
-@media (prefers-reduced-motion: reduce) {
-  .marquee { -webkit-mask-image: none; mask-image: none; overflow-x: auto; }
-  .marquee-set { animation: none; }
-  .marquee-set[aria-hidden='true'] { display: none; }
-}
+/* Con movimiento reducido la cinta no se detiene: baja a menos de
+   la mitad de velocidad (se controla en JS). Un desplazamiento
+   lineal y lento es tolerable; detenerla obligaba a una barra de
+   scroll manual, que era peor. */
 
 /* ============ Contacto ============ */
 .contact { padding-block: clamp(70px, 12vh, 140px); }

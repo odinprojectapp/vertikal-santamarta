@@ -60,6 +60,64 @@ const CIFRAS = [
   { b: 'Pendiente', s: 'Personas certificadas — dato por confirmar', ok: false },
 ]
 
+/* ============ Marquesina ============
+   El desplazamiento se hace por JS y no con animación CSS: si el
+   sistema pide movimiento reducido, el navegador congela las
+   animaciones CSS y la cinta se quedaba quieta con una barra de
+   scroll asomando. Aquí la velocidad se reduce, pero nunca se
+   detiene ni aparece barra. */
+function Marquesina({ items }) {
+  const pista = useRef(null)
+  const x = useRef(0)
+
+  useEffect(() => {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const vel = reduce ? 14 : 34   // px por segundo
+    let anterior = performance.now()
+    let raf
+
+    const paso = (ahora) => {
+      const dt = Math.min((ahora - anterior) / 1000, 0.05)
+      anterior = ahora
+      const el = pista.current
+      if (el) {
+        /* El ancho de UNA copia: al superarlo se reinicia sin salto,
+           porque la segunda copia ya ocupa exactamente ese hueco. */
+        const ancho = el.scrollWidth / 2
+        x.current = ancho ? (x.current + vel * dt) % ancho : 0
+        el.style.transform = `translate3d(${-x.current}px,0,0)`
+      }
+      raf = requestAnimationFrame(paso)
+    }
+    raf = requestAnimationFrame(paso)
+    return () => cancelAnimationFrame(raf)
+  }, [])
+
+  return (
+    <div className="marquee">
+      <div className="marquee-track" ref={pista}>
+        {[0, 1].map((copia) => (
+          <div className="marquee-set" key={copia} aria-hidden={copia === 1}>
+            {items.map((r) => (
+              <figure className="ref" key={`${copia}-${r.n}`}
+                role={copia === 0 ? 'listitem' : undefined}>
+                {r.f
+                  ? <img src={`${import.meta.env.BASE_URL}referentes/${r.f}`}
+                      alt={r.n} loading="lazy" draggable="false" />
+                  : <span className="ref-wordmark">{r.n}</span>}
+                <figcaption>
+                  <b>{r.n}</b>
+                  <span>{r.d}</span>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export default function App() {
   const raiz = useRef(null)
   const barra = useRef(null)
@@ -262,26 +320,7 @@ export default function App() {
           </p>
         </div>
 
-        {/* Marquesina doble: la segunda copia entra justo cuando la
-            primera sale, así el bucle no tiene costura visible. */}
-        <div className="marquee" role="list" aria-label="Empresas referentes">
-          <div className="marquee-track">
-            {[0, 1].map((copia) => (
-              <div className="marquee-set" key={copia} aria-hidden={copia === 1}>
-                {REFERENTES.map((r) => (
-                  <figure className="ref" key={`${copia}-${r.n}`} role="listitem">
-                    <img src={`${import.meta.env.BASE_URL}referentes/${r.f}`}
-                      alt={r.n} loading="lazy" draggable="false" />
-                    <figcaption>
-                      <b>{r.n}</b>
-                      <span>{r.d}</span>
-                    </figcaption>
-                  </figure>
-                ))}
-              </div>
-            ))}
-          </div>
-        </div>
+        <Marquesina items={REFERENTES} />
       </section>
 
       {/* ---------- CIFRAS ---------- */}
