@@ -617,3 +617,49 @@ img, svg { display: block; max-width: 100%; }
   .scroll-cue span { display: none; }
   html { scroll-behavior: auto; }
 }
+
+
+/* ============ BANCO DE PRUEBAS (temporal) ============ */
+.prueba {
+  min-height: 100vh;
+  padding: clamp(32px, 6vw, 72px) var(--edge) 120px;
+  background: var(--void);
+}
+.prueba-top { max-width: 60ch; margin-bottom: clamp(40px, 7vh, 80px); }
+.prueba-top h1 { font-size: var(--t-2xl); margin-block: 14px 0; }
+.prueba-top p { color: var(--bone-2); margin-block-start: 14px; }
+
+.caso {
+  padding-block: clamp(30px, 5vh, 54px);
+  border-block-start: 1px solid var(--grid);
+}
+.caso .tag {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: var(--t-xs);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--hazard);
+  margin-bottom: 18px;
+}
+.caso .grande  { font-size: clamp(2rem, 1.2rem + 4.2vw, 4.6rem); }
+.caso .mediano { font-size: clamp(1.3rem, 1rem + 1.6vw, 2.2rem); line-height: 1.15; }
+.caso .amber   { color: var(--hazard); }
+.caso .nota {
+  margin-block-start: 20px;
+  color: var(--bone-3);
+  font-size: var(--t-sm);
+  max-width: 56ch;
+}
+
+/* splitText necesita que las líneas recorten para la máscara */
+.mask-chars { display: inline-block; }
+.mask-chars .line { overflow: hidden; }
+
+.botones { display: flex; gap: 12px; flex-wrap: wrap; }
+.cta.ghost {
+  background: transparent;
+  color: var(--hazard);
+  border: 1px solid var(--hazard);
+}
+.cta.ghost:hover { background: rgba(242, 195, 0, 0.12); }
