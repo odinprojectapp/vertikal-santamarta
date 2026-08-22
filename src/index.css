@@ -771,6 +771,64 @@ img, svg { display: block; max-width: 100%; }
 .cta:hover  { background: var(--hazard-hot); }
 .cta:active { transform: scale(0.975); }
 
+/* ============ Redes sociales ============
+   Solo las verificadas: su web tenía iconos de Twitter y YouTube
+   que iban a las portadas genéricas de esas redes, no a perfiles
+   suyos. Enlazar eso echa visitas fuera para nada. */
+.redes {
+  margin-block-start: clamp(46px, 7vh, 76px);
+  padding-block-start: clamp(26px, 4vh, 38px);
+  border-block-start: 1px solid var(--grid);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 18px clamp(24px, 4vw, 44px);
+}
+.redes-t {
+  font-size: var(--t-xs);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--bone-3);
+}
+.redes-lista { display: flex; flex-wrap: wrap; gap: 1px; }
+
+.red {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  border: 1px solid var(--grid);
+  color: var(--bone-2);
+  transition: color 0.3s var(--exp), border-color 0.3s var(--exp),
+              background 0.3s var(--exp);
+}
+.red + .red { margin-inline-start: -1px; }
+.red-tx { display: flex; flex-direction: column; line-height: 1.35; }
+.red-tx b {
+  font-family: var(--mono);
+  font-size: var(--t-xs);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.red-tx em {
+  font-style: normal;
+  font-family: var(--mono);
+  font-size: var(--t-xs);
+  letter-spacing: 0.05em;
+  color: var(--bone-3);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .red:hover {
+    color: var(--hazard);
+    border-color: var(--hazard);
+    background: rgba(242, 195, 0, 0.06);
+    position: relative;
+    z-index: 1;
+  }
+}
+
 /* ============ Pie ============ */
 .foot {
   border-block-start: 1px solid var(--grid);

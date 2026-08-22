@@ -134,6 +134,24 @@ y un lector de pantalla no los lee. Aquí van como texto real.
 | 05 | Mística | Realizamos nuestro trabajo bien desde el principio, con la convicción de hacer lo mejor de manera segura |
 | 06 | Respeto | Entendemos tus necesidades, las apropiamos como nuestras |
 
+## Redes y WhatsApp
+
+**Mensaje predefinido:** los botones de WhatsApp abren el chat con el
+texto ya escrito («Hola, los contacto desde su página web…»), así el
+visitante no redacta nada y a Vertikal le entra el contexto.
+
+**Redes verificadas el 22-08-2026:**
+
+| Red | Perfil | Estado |
+|---|---|---|
+| Instagram | [@vertikalsas](https://www.instagram.com/vertikalsas/) | ✓ 194 publicaciones, 234 seguidores |
+| Facebook | [JFC Vertikal SAS](https://www.facebook.com/JFCVERTIKAL/) | ✓ Verificado |
+
+> Su web tenía además iconos de **Twitter y YouTube apuntando a las
+> portadas genéricas** de esas redes, no a perfiles suyos. No se
+> enlazan: mandar visitas fuera del sitio para nada es peor que no
+> tener el icono.
+
 ## Referentes — todos verificados
 
 Los siete logos salen de la **biblioteca de medios del propio sitio de

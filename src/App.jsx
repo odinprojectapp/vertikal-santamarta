@@ -14,6 +14,22 @@ const WA = '573153147530'          // ✓ verificado
 const TEL = '6054406984'           // ✓ verificado
 const MAIL = 'info@vertikal.com.co' // ✓ verificado
 
+/* Redes verificadas el 22-08-2026. Solo se enlazan las reales: su
+   web tenía iconos de Twitter y YouTube apuntando a las portadas
+   genéricas de esas redes, no a perfiles suyos. */
+const REDES = [
+  { id: 'ig', n: 'Instagram', u: 'https://www.instagram.com/vertikalsas/', h: '@vertikalsas' },
+  { id: 'fb', n: 'Facebook',  u: 'https://www.facebook.com/JFCVERTIKAL/',  h: 'JFC Vertikal SAS' },
+]
+
+/* Mensaje predefinido: llega escrito al chat, así el cliente no
+   tiene que redactar nada y a Vertikal le entra el contexto. */
+const WA_MSG = encodeURIComponent(
+  'Hola, los contacto desde su página web. Me interesa información sobre ' +
+  'sus servicios de trabajo seguro en alturas.'
+)
+const WA_LINK = `https://wa.me/${WA}?text=${WA_MSG}`
+
 /* La altura desde la que la norma colombiana exige protección
    contra caídas. Es el umbral que dispara el estado del altímetro. */
 const UMBRAL_M = 1.8
@@ -191,6 +207,20 @@ function Icono({ tipo }) {
   return (
     <svg viewBox="0 0 48 48" width="34" height="34" aria-hidden="true">
       {svg}
+    </svg>
+  )
+}
+
+/* ---------- Iconos de red ---------- */
+function IconoRed({ id }) {
+  return (
+    <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"
+      fill="currentColor">
+      {id === 'ig' ? (
+        <path d="M12 2.2c3.2 0 3.6 0 4.9.07 1.2.06 1.8.25 2.2.42.6.22 1 .48 1.4.9.44.43.7.83.92 1.4.17.42.36 1.05.42 2.24.06 1.28.07 1.66.07 4.88s0 3.6-.07 4.88c-.06 1.2-.25 1.82-.42 2.24-.22.56-.48.97-.92 1.4-.42.42-.83.68-1.4.9-.42.17-1.05.36-2.24.42-1.28.06-1.66.07-4.88.07s-3.6 0-4.88-.07c-1.2-.06-1.82-.25-2.24-.42-.56-.22-.97-.48-1.4-.9-.42-.43-.68-.84-.9-1.4-.17-.42-.36-1.05-.42-2.24C2.2 15.6 2.2 15.2 2.2 12s0-3.6.07-4.88c.06-1.2.25-1.82.42-2.24.22-.57.48-.97.9-1.4.43-.42.84-.68 1.4-.9.42-.17 1.05-.36 2.24-.42C8.4 2.2 8.8 2.2 12 2.2zm0 1.98c-3.16 0-3.5 0-4.74.07-1.14.05-1.76.24-2.17.4-.55.2-.94.47-1.35.88-.4.4-.66.8-.88 1.35-.16.4-.35 1.03-.4 2.17-.06 1.23-.07 1.6-.07 4.74s0 3.5.07 4.74c.05 1.14.24 1.76.4 2.17.22.55.48.94.88 1.35.4.4.8.66 1.35.88.4.16 1.03.35 2.17.4 1.23.06 1.6.07 4.74.07s3.5 0 4.74-.07c1.14-.05 1.76-.24 2.17-.4.55-.22.94-.48 1.35-.88.4-.4.66-.8.88-1.35.16-.4.35-1.03.4-2.17.06-1.23.07-1.6.07-4.74s0-3.5-.07-4.74c-.05-1.14-.24-1.76-.4-2.17a3.6 3.6 0 0 0-.88-1.35 3.6 3.6 0 0 0-1.35-.88c-.4-.16-1.03-.35-2.17-.4-1.23-.06-1.6-.07-4.74-.07zm0 3.37a5.03 5.03 0 1 1 0 10.06 5.03 5.03 0 0 1 0-10.06zm0 1.98a3.05 3.05 0 1 0 0 6.1 3.05 3.05 0 0 0 0-6.1zm6.4-2.2a1.18 1.18 0 1 1-2.35 0 1.18 1.18 0 0 1 2.35 0z" />
+      ) : (
+        <path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5.02 3.66 9.18 8.44 9.94v-7.03H7.9v-2.9h2.54V9.85c0-2.52 1.5-3.9 3.77-3.9 1.1 0 2.24.19 2.24.19v2.46h-1.26c-1.24 0-1.63.78-1.63 1.57v1.89h2.78l-.45 2.9h-2.33V22c4.78-.76 8.44-4.92 8.44-9.94z" />
+      )}
     </svg>
   )
 }
@@ -639,7 +669,7 @@ export default function App() {
           <div className="reveal">
             <span className="eyebrow">Contacto directo</span>
             <h2>Hablemos<br />de su operación</h2>
-            <a className="cta" href={`https://wa.me/${WA}`}
+            <a className="cta" href={WA_LINK}
               target="_blank" rel="noopener noreferrer">
               Escribir por WhatsApp
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
@@ -653,7 +683,7 @@ export default function App() {
             <a href={`tel:+57${TEL}`}>
               <span className="k">Teléfono</span>605 440 6984
             </a>
-            <a href={`https://wa.me/${WA}`} target="_blank" rel="noopener noreferrer">
+            <a href={WA_LINK} target="_blank" rel="noopener noreferrer">
               <span className="k">WhatsApp</span>315 314 7530
             </a>
             <a href={`mailto:${MAIL}`}>
@@ -662,6 +692,22 @@ export default function App() {
             <div>
               <span className="k">Dirección</span>Carrera 8B # 23-42 · Santa Marta
             </div>
+          </div>
+        </div>
+
+        <div className="redes">
+          <span className="redes-t mono">Síganos</span>
+          <div className="redes-lista">
+            {REDES.map((r) => (
+              <a key={r.id} href={r.u} target="_blank" rel="noopener noreferrer"
+                className="red" aria-label={`${r.n}: ${r.h}`}>
+                <IconoRed id={r.id} />
+                <span className="red-tx">
+                  <b>{r.n}</b>
+                  <em>{r.h}</em>
+                </span>
+              </a>
+            ))}
           </div>
         </div>
 
