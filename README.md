@@ -46,11 +46,17 @@ Su negocio, convertido en interfaz.
 
 ### El descenso en WebGL
 
-La torre es una estructura 3D real (Three.js + React Three Fiber) y la
-cámara **desciende por dentro** de ella: los montantes pasan a los
-lados y los niveles se alejan en perspectiva. Ese recorrido interior es
-lo que produce la sensación de descender — una torre vista desde fuera
-solo se desplaza, no se atraviesa.
+Una **torre de telecomunicaciones** (celosía, antenas sectoriales,
+platos parabólicos y baliza) con una **línea de vida vertical** — el
+producto que Vertikal instala y certifica.
+
+Un **técnico con casco, arnés y equipo** desciende por esa línea a lo
+largo del scroll, en pose de rápel real: sentado en el arnés, piernas
+flexionadas apoyadas contra la estructura.
+
+La cámara lo sigue **desde fuera**, girando ~140° alrededor de la torre
+durante el recorrido y variando distancia y altura. El movimiento se
+lee como una grúa de cine, no como una cámara clavada.
 
 **Rendimiento:** las ~700 barras van en dos `InstancedMesh` (un draw
 call cada uno). Medido: **60 fps** estables. Con un `Mesh` por barra

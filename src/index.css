@@ -274,18 +274,28 @@ img, svg { display: block; max-width: 100%; }
 
 /* --- Panel pinneado del riesgo --- */
 .risk {
-  /* Translucido: la torre sigue descendiendo detras del panel. */
-  background: rgba(10, 12, 14, 0.82);
-  backdrop-filter: blur(3px);
+  /* Degradado lateral: opaco a la izquierda para que el texto se
+     lea, transparente a la derecha para ver el descenso. */
+  background: linear-gradient(90deg,
+    rgba(10,12,14,0.94) 0%, rgba(10,12,14,0.88) 42%,
+    rgba(10,12,14,0.35) 68%, rgba(10,12,14,0.1) 100%);
   border-block: 1px solid var(--grid);
+}
+@media (max-width: 900px) {
+  .risk { background: rgba(10,12,14,0.9); }
 }
 .risk-pin {
   height: 100vh; height: 100svh;
   display: grid;
-  place-content: center;
-  text-align: center;
+  align-content: center;
+  justify-items: start;
+  text-align: start;
   padding-inline: var(--edge);
+  /* Solo la mitad izquierda: la derecha queda libre para ver
+     al técnico descender detrás. */
+  max-width: 54%;
 }
+@media (max-width: 900px) { .risk-pin { max-width: 100%; } }
 .risk-num {
   font-family: var(--display);
   font-size: clamp(5rem, 3rem + 14vw, 16rem);
@@ -300,8 +310,7 @@ img, svg { display: block; max-width: 100%; }
   text-transform: uppercase;
   color: var(--bone-2);
   margin-block-start: 20px;
-  max-width: 40ch;
-  margin-inline: auto;
+  max-width: 34ch;
 }
 .risk-note {
   margin-block-start: 28px;

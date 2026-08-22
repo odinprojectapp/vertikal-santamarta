@@ -3,110 +3,62 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 
 /* ============================================================
-   TORRE 3D — el descenso
-   La cámara baja POR DENTRO de la estructura atravesando sus
-   niveles. Eso es lo que produce la sensación de descender:
-   los travesaños pasan por encima del observador uno a uno.
+   TORRE DE TELECOMUNICACIONES — el descenso
+   Un técnico desciende por la línea de vida. La cámara lo sigue
+   DESDE FUERA y cambia de ángulo durante el recorrido.
+   El protagonista es la persona, no la estructura.
    ============================================================ */
 
-const NIVELES = 26          // pisos de la torre
-const ALTO_NIVEL = 9        // separación vertical entre travesaños
+const NIVELES = 22
+const ALTO_NIVEL = 5.2
 const ALTO_TOTAL = NIVELES * ALTO_NIVEL
 
-/* La torre se estrecha con la altura, como una torre real.
-   Radio en la base vs. en la cima. */
-const R_BASE = 26
-const R_CIMA = 15
+const R_BASE = 9
+const R_CIMA = 2.6
 const radioEn = (y) => {
   const t = THREE.MathUtils.clamp(y / ALTO_TOTAL, 0, 1)
   return THREE.MathUtils.lerp(R_BASE, R_CIMA, t)
 }
 
-/* Cuatro montantes en las esquinas de una planta cuadrada. */
-const ESQUINAS = [
-  [1, 1], [1, -1], [-1, -1], [-1, 1],
-]
+const ESQUINAS = [[1, 1], [1, -1], [-1, -1], [-1, 1]]
 
-/* ---------- Estructura instanciada ----------
-   Todos los perfiles comparten geometría y material: van en un
-   solo InstancedMesh, un único draw call. Con un Mesh por barra
-   serían ~400 draw calls y caería a 20fps en gama media. */
-function Estructura({ material }) {
+/* La línea de vida corre pegada a la cara frontal (+Z). */
+const LINEA_X = 0
+const lineaZ = (y) => radioEn(y) + 0.55
+
+/* ---------- Celosía instanciada ----------
+   Todas las barras comparten geometría y material: un solo
+   InstancedMesh, un único draw call. */
+function Celosia({ material }) {
   const ref = useRef()
 
-  /* Las matrices se calculan UNA vez, nunca por frame. */
   const matrices = useMemo(() => {
     const out = []
-    const dummy = new THREE.Object3D()
+    const d = new THREE.Object3D()
+    const eje = new THREE.Vector3(0, 1, 0)
 
-    const barra = (a, b, grosor) => {
+    const barra = (a, b, g) => {
       const dir = new THREE.Vector3().subVectors(b, a)
-      const largo = dir.length()
-      const medio = new THREE.Vector3().addVectors(a, b).multiplyScalar(0.5)
-      dummy.position.copy(medio)
-      /* El cilindro nace en Y: se rota para alinearlo con el vector. */
-      dummy.quaternion.setFromUnitVectors(
-        new THREE.Vector3(0, 1, 0), dir.clone().normalize()
-      )
-      dummy.scale.set(grosor, largo, grosor)
-      dummy.updateMatrix()
-      out.push(dummy.matrix.clone())
+      d.position.copy(a).add(b).multiplyScalar(0.5)
+      d.quaternion.setFromUnitVectors(eje, dir.clone().normalize())
+      d.scale.set(g, dir.length(), g)
+      d.updateMatrix()
+      out.push(d.matrix.clone())
     }
 
     for (let n = 0; n < NIVELES; n++) {
       const y0 = n * ALTO_NIVEL
       const y1 = y0 + ALTO_NIVEL
-      const r0 = radioEn(y0)
-      const r1 = radioEn(y1)
+      const r0 = radioEn(y0), r1 = radioEn(y1)
+      const p0 = ESQUINAS.map(([x, z]) => new THREE.Vector3(x * r0, y0, z * r0))
+      const p1 = ESQUINAS.map(([x, z]) => new THREE.Vector3(x * r1, y1, z * r1))
 
-      const p0 = ESQUINAS.map(([sx, sz]) => new THREE.Vector3(sx * r0, y0, sz * r0))
-      const p1 = ESQUINAS.map(([sx, sz]) => new THREE.Vector3(sx * r1, y1, sz * r1))
-
-      /* Montantes verticales */
-      for (let i = 0; i < 4; i++) barra(p0[i], p1[i], 0.62)
-
-      /* Travesaños horizontales — son los que "pasan" al descender */
-      for (let i = 0; i < 4; i++) barra(p0[i], p0[(i + 1) % 4], 0.46)
-
-      /* Diagonales alternadas: la cruz de San Andrés real */
+      for (let i = 0; i < 4; i++) barra(p0[i], p1[i], 0.26)
+      for (let i = 0; i < 4; i++) barra(p0[i], p0[(i + 1) % 4], 0.17)
       for (let i = 0; i < 4; i++) {
         const j = (i + 1) % 4
-        if ((n + i) % 2 === 0) barra(p0[i], p1[j], 0.3)
-        else barra(p1[i], p0[j], 0.3)
-      }
-    }
-    return out
-  }, [])
-
-  useLayoutEffect(() => {
-    const m = ref.current
-    matrices.forEach((mat, i) => m.setMatrixAt(i, mat))
-    m.instanceMatrix.needsUpdate = true
-  }, [matrices])
-
-  return (
-    <instancedMesh ref={ref} args={[undefined, undefined, matrices.length]}
-      material={material} frustumCulled={false}>
-      <cylinderGeometry args={[1, 1, 1, 6]} />
-    </instancedMesh>
-  )
-}
-
-/* ---------- Rejilla de piso en cada plataforma ---------- */
-function Plataformas({ material }) {
-  const ref = useRef()
-  const matrices = useMemo(() => {
-    const out = []
-    const d = new THREE.Object3D()
-    for (let n = 2; n < NIVELES; n += 3) {
-      const y = n * ALTO_NIVEL
-      const r = radioEn(y)
-      for (let i = -3; i <= 3; i++) {
-        d.position.set(0, y, (i / 3) * r * 0.86)
-        d.quaternion.identity()
-        d.scale.set(r * 1.75, 0.16, 0.16)
-        d.updateMatrix()
-        out.push(d.matrix.clone())
+        if ((n + i) % 2 === 0) barra(p0[i], p1[j], 0.12)
+        else barra(p1[i], p0[j], 0.12)
       }
     }
     return out
@@ -120,111 +72,207 @@ function Plataformas({ material }) {
   return (
     <instancedMesh ref={ref} args={[undefined, undefined, matrices.length]}
       material={material} frustumCulled={false}>
-      <boxGeometry args={[1, 1, 1]} />
+      <cylinderGeometry args={[1, 1, 1, 6]} />
     </instancedMesh>
   )
 }
 
-/* ---------- Cámara: el descenso ----------
-   Lee el progreso del scroll (0→1) desde una ref externa y lo
-   aplica dentro de useFrame. No se usa gsap.to sobre la cámara:
-   así el movimiento queda dentro del ciclo de render de R3F. */
-function CamaraDescenso({ progreso, reduce }) {
-  const { camera } = useThree()
+/* ---------- Antenas ----------
+   Hacen reconocible la torre como de telecomunicaciones. */
+function Antenas({ acero, baliza }) {
+  return (
+    <group position={[0, ALTO_TOTAL, 0]}>
+      <mesh material={acero} position={[0, 5, 0]}>
+        <cylinderGeometry args={[0.16, 0.16, 10, 8]} />
+      </mesh>
+      {[0, 1, 2].map((i) => (
+        <group key={i} rotation={[0, (i / 3) * Math.PI * 2, 0]}>
+          <mesh material={acero} position={[R_CIMA + 1.1, -1.6, 0]}
+            rotation={[0, 0, Math.PI / 2]}>
+            <cylinderGeometry args={[1.5, 1.5, 0.22, 14]} />
+          </mesh>
+          <mesh material={acero} position={[R_CIMA + 0.5, -1.6, 0]}
+            rotation={[0, 0, Math.PI / 2]}>
+            <cylinderGeometry args={[0.1, 0.1, 1.3, 6]} />
+          </mesh>
+          <mesh material={acero} position={[R_CIMA + 0.4, 2.4, 0]}>
+            <boxGeometry args={[0.3, 2.6, 0.75]} />
+          </mesh>
+        </group>
+      ))}
+      <mesh material={baliza} position={[0, 10.4, 0]}>
+        <sphereGeometry args={[0.42, 12, 12]} />
+      </mesh>
+    </group>
+  )
+}
+
+/* ---------- Línea de vida vertical ----------
+   Es el producto que Vertikal instala y certifica: debe verse. */
+function LineaVida({ material }) {
+  const geo = useMemo(() => {
+    const pts = []
+    for (let i = 0; i <= 24; i++) {
+      const y = (i / 24) * ALTO_TOTAL
+      pts.push(new THREE.Vector3(LINEA_X, y, lineaZ(y)))
+    }
+    return new THREE.TubeGeometry(
+      new THREE.CatmullRomCurve3(pts), 48, 0.09, 6, false
+    )
+  }, [])
+  useLayoutEffect(() => () => geo.dispose(), [geo])
+  return <mesh geometry={geo} material={material} />
+}
+
+/* ---------- EL TÉCNICO ----------
+   Pose de rápel real: sentado en el arnés, piernas flexionadas
+   apoyadas contra la estructura. No es una figura colgando recta. */
+function Tecnico({ progreso, cuerpo, casco, arnes, piel }) {
+  const g = useRef()
+  const brazo = useRef()
   const suave = useRef(0)
 
-  useFrame((_, delta) => {
-    const meta = progreso.current
-    /* Interpolación amortiguada por delta: independiente de los
-       Hz del monitor. Un incremento fijo correría distinto en
-       144Hz que en 60Hz. */
-    const k = 1 - Math.pow(0.0016, delta)
-    suave.current += (meta - suave.current) * k
-
+  useFrame((state, delta) => {
+    const k = 1 - Math.pow(0.0018, delta)
+    suave.current += (progreso.current - suave.current) * k
     const p = suave.current
-    const y = ALTO_TOTAL * (1 - p) + 2.5
+    const y = ALTO_TOTAL * (1 - p) - 1.5
+
+    if (!g.current) return
+    g.current.position.set(LINEA_X, y, lineaZ(y) - 0.75)
+    g.current.rotation.y = Math.PI
+
+    /* Balanceo sutil: es un descenso controlado, no un péndulo. */
+    const t = state.clock.elapsedTime
+    g.current.rotation.z = Math.sin(t * 1.1) * 0.045
+    if (brazo.current) brazo.current.rotation.x = -0.5 + Math.sin(t * 1.6) * 0.12
+  })
+
+  return (
+    <group ref={g}>
+      <mesh material={casco} position={[0, 1.62, 0]}>
+        <sphereGeometry args={[0.3, 14, 12, 0, Math.PI * 2, 0, Math.PI * 0.62]} />
+      </mesh>
+      <mesh material={piel} position={[0, 1.5, 0]}>
+        <sphereGeometry args={[0.245, 12, 12]} />
+      </mesh>
+      <mesh material={cuerpo} position={[0, 1.02, 0.06]} rotation={[0.28, 0, 0]}>
+        <capsuleGeometry args={[0.27, 0.68, 4, 10]} />
+      </mesh>
+      <mesh material={arnes} position={[0, 1.12, 0.03]} rotation={[0.28, 0, 0]}>
+        <torusGeometry args={[0.3, 0.055, 8, 16]} />
+      </mesh>
+      <mesh material={arnes} position={[0, 0.62, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[0.31, 0.07, 8, 16]} />
+      </mesh>
+      <mesh material={arnes} position={[0, 0.62, -0.34]}>
+        <boxGeometry args={[0.17, 0.17, 0.12]} />
+      </mesh>
+
+      {[-1, 1].map((s) => (
+        <group key={s} position={[s * 0.18, 0.55, 0]}>
+          <mesh material={cuerpo} position={[0, -0.3, -0.26]} rotation={[-0.95, 0, 0]}>
+            <capsuleGeometry args={[0.115, 0.5, 4, 8]} />
+          </mesh>
+          <mesh material={cuerpo} position={[0, -0.5, -0.82]} rotation={[-0.15, 0, 0]}>
+            <capsuleGeometry args={[0.1, 0.5, 4, 8]} />
+          </mesh>
+          <mesh material={arnes} position={[0, -0.72, -1.05]}>
+            <boxGeometry args={[0.19, 0.14, 0.3]} />
+          </mesh>
+        </group>
+      ))}
+
+      <group ref={brazo} position={[0.3, 1.16, 0]}>
+        <mesh material={cuerpo} position={[0, -0.26, -0.1]} rotation={[-0.5, 0, 0]}>
+          <capsuleGeometry args={[0.095, 0.44, 4, 8]} />
+        </mesh>
+      </group>
+      <mesh material={cuerpo} position={[-0.3, 0.92, -0.16]} rotation={[-0.75, 0, 0]}>
+        <capsuleGeometry args={[0.095, 0.46, 4, 8]} />
+      </mesh>
+    </group>
+  )
+}
+
+/* ---------- Cámara: sigue al técnico DESDE FUERA ----------
+   El ángulo orbital y la distancia cambian durante el descenso,
+   así el recorrido se lee como un movimiento de grúa y no como
+   una cámara clavada. */
+function Camara({ progreso, reduce }) {
+  const { camera } = useThree()
+  const suave = useRef(0)
+  const mira = useRef(new THREE.Vector3(0, ALTO_TOTAL, 0))
+  const objetivo = useRef(new THREE.Vector3())
+
+  useFrame((_, delta) => {
+    const k = 1 - Math.pow(0.0022, delta)
+    suave.current += (progreso.current - suave.current) * k
+    const p = suave.current
+    const yTec = ALTO_TOTAL * (1 - p) - 1.5
 
     if (reduce) {
-      /* Con movimiento reducido: vista fija exterior, sin recorrido. */
-      camera.position.set(48, ALTO_TOTAL * 0.55, 62)
-      camera.lookAt(0, ALTO_TOTAL * 0.45, 0)
+      camera.position.set(26, ALTO_TOTAL * 0.62, 34)
+      camera.lookAt(0, ALTO_TOTAL * 0.5, 0)
       return
     }
 
-    /* La cámara desciende PEGADA a un montante, dentro de la
-       estructura. El radio alto (0.82) la deja junto al acero:
-       las barras pasan cerca del objetivo y ese roce es lo que
-       produce la sensación de descender, no la vista lejana. */
-    const giro = p * Math.PI * 1.5
-    /* 0.72 del radio: dentro de la estructura pero cerca del
-       acero. Los montantes pasan a los lados del encuadre. */
-    const rIn = radioEn(y) * 0.72
-    camera.position.set(
-      Math.sin(giro) * rIn,
-      y,
-      Math.cos(giro) * rIn
-    )
-    /* Mira casi en vertical hacia el fondo del hueco: es la
-       vista de quien desciende mirando dónde pisa. */
-    camera.lookAt(
-      Math.sin(giro) * rIn * 0.25,
-      y - 26,
-      Math.cos(giro) * rIn * 0.25
-    )
-    /* Ligero alabeo con el giro: da cuerpo al movimiento. */
-    camera.rotation.z = Math.sin(p * Math.PI * 2) * 0.055
+    /* El ángulo gira ~140° durante el descenso. La distancia se
+       acorta solo un poco: acercarse demasiado metía las barras
+       en primer plano y tapaba al técnico. */
+    const ang = THREE.MathUtils.lerp(0.5, 2.9, p)
+    /* 22 u: lo bastante cerca para leer al técnico como persona,
+       lo bastante lejos para que la celosía no llene el cuadro. */
+    const dist = 22 - Math.sin(p * Math.PI) * 4
+    const alto = THREE.MathUtils.lerp(4, 2, p)
+
+    camera.position.set(Math.sin(ang) * dist, yTec + alto, Math.cos(ang) * dist)
+
+    /* El técnico se encuadra a la derecha del texto: el objetivo
+       se desplaza en X para dejarle la izquierda a la tipografía. */
+    /* El objetivo se desplaza a la IZQUIERDA del eje, lo que
+       empuja al técnico hacia la DERECHA del encuadre y deja la
+       izquierda libre para la tipografía. */
+    objetivo.current.set(6.5, yTec + 1.2, 0)
+    mira.current.lerp(objetivo.current, 0.12)
+    camera.lookAt(mira.current)
   })
 
   return null
 }
 
-/* ---------- Luz que desciende con la cámara ----------
-   Un punto de luz anclado a la altura actual. Sin esto el
-   interior de la torre queda completamente a oscuras. */
-function LuzDescenso({ progreso }) {
-  const ref = useRef()
-  const suave = useRef(0)
-  useFrame((_, delta) => {
-    const k = 1 - Math.pow(0.0016, delta)
-    suave.current += (progreso.current - suave.current) * k
-    const y = ALTO_TOTAL * (1 - suave.current) + 2.5
-    if (ref.current) ref.current.position.set(0, y + 3, 0)
-  })
-  return <pointLight ref={ref} intensity={2600} distance={150} decay={1.25} color="#FFE9C4" />
-}
-
 /* ---------- Escena ---------- */
 function Escena({ progreso, reduce }) {
-  /* Materiales creados una sola vez y compartidos por los
-     InstancedMesh. Crearlos en el render los recrearía por frame. */
-  const acero = useMemo(() => new THREE.MeshStandardMaterial({
-    color: '#C6D0DA', roughness: 0.42, metalness: 0.6,
-  }), [])
-  const rejilla = useMemo(() => new THREE.MeshStandardMaterial({
-    color: '#C2C9D0', roughness: 0.6, metalness: 0.5,
+  const mats = useMemo(() => ({
+    acero: new THREE.MeshStandardMaterial({ color: '#9FAAB6', roughness: 0.5, metalness: 0.75 }),
+    cable: new THREE.MeshStandardMaterial({ color: '#D8DEE4', roughness: 0.35, metalness: 0.85 }),
+    cuerpo: new THREE.MeshStandardMaterial({ color: '#1F5FA8', roughness: 0.82 }),
+    casco: new THREE.MeshStandardMaterial({ color: '#F2C300', roughness: 0.42, metalness: 0.15 }),
+    arnes: new THREE.MeshStandardMaterial({ color: '#23262A', roughness: 0.75 }),
+    piel: new THREE.MeshStandardMaterial({ color: '#B8895E', roughness: 0.9 }),
+    baliza: new THREE.MeshStandardMaterial({
+      color: '#E5342A', emissive: '#E5342A', emissiveIntensity: 1.6, roughness: 0.5,
+    }),
   }), [])
 
-  useLayoutEffect(() => () => { acero.dispose(); rejilla.dispose() }, [acero, rejilla])
+  useLayoutEffect(() => () => Object.values(mats).forEach((m) => m.dispose()), [mats])
 
   return (
     <>
-      {/* Niebla: oculta el final de la torre y da sensación de
-          profundidad y altura. Sin ella se ve el borde del modelo. */}
-      <fog attach="fog" args={['#0A0C0E', 34, 190]} />
-      <color attach="background" args={['#0A0C0E']} />
+      <fog attach="fog" args={['#12171C', 40, 220]} />
+      <color attach="background" args={['#12171C']} />
 
-      {/* Iluminación barata primero, como manda el orden de coste. */}
-      <hemisphereLight args={['#AEBDCB', '#141A20', 3.4]} />
-      <directionalLight position={[14, ALTO_TOTAL * 1.1, 10]} intensity={4.2} color="#FFF6E2" />
-      <directionalLight position={[-12, ALTO_TOTAL * 0.4, -8]} intensity={1.5} color="#8FB4E0" />
-      {/* Luz de acompañamiento que baja CON la cámara: sin ella
-          el interior de la torre queda en sombra total. */}
-      <LuzDescenso progreso={progreso} />
+      <hemisphereLight args={['#9FB4C8', '#0E1216', 2.2]} />
+      <directionalLight position={[30, ALTO_TOTAL * 1.2, 22]} intensity={3} color="#FFF4DC" />
+      <directionalLight position={[-24, ALTO_TOTAL * 0.4, -16]} intensity={0.9} color="#7FA0C8" />
 
-      <Estructura material={acero} />
-      <Plataformas material={rejilla} />
+      <Celosia material={mats.acero} />
+      <Antenas acero={mats.acero} baliza={mats.baliza} />
+      <LineaVida material={mats.cable} />
+      <Tecnico progreso={progreso} cuerpo={mats.cuerpo}
+        casco={mats.casco} arnes={mats.arnes} piel={mats.piel} />
 
-      <CamaraDescenso progreso={progreso} reduce={reduce} />
+      <Camara progreso={progreso} reduce={reduce} />
     </>
   )
 }
@@ -232,11 +280,9 @@ function Escena({ progreso, reduce }) {
 export default function Torre({ progreso, reduce }) {
   return (
     <Canvas
-      /* dpr acotado: a 3x en un móvil de alta densidad el coste de
-         fragmentos se multiplica por 9 sin beneficio visible. */
       dpr={[1, 1.75]}
       gl={{ antialias: true, powerPreference: 'high-performance' }}
-      camera={{ fov: 76, near: 0.1, far: 320, position: [0, ALTO_TOTAL, 8] }}
+      camera={{ fov: 46, near: 0.5, far: 480, position: [20, ALTO_TOTAL, 28] }}
       style={{ position: 'absolute', inset: 0 }}
     >
       <Escena progreso={progreso} reduce={reduce} />
