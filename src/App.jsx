@@ -376,46 +376,37 @@ export default function App() {
 
       {/* ---------- VALIDAR CERTIFICADO ---------- */}
       <section className="chapter wrap valida-sec" id="validar">
-        <div className="vgrid">
-          <div className="reveal">
-            <span className="eyebrow">Validar certificado</span>
-            <h2 className="vtitulo">Toda certificación<br />queda registrada</h2>
-            <p className="vtexto">
-              Las certificaciones de trabajo seguro en alturas se consultan
-              directamente en el portal del <strong>Ministerio del
-              Trabajo</strong>. Verifíquelas antes de subir a nadie a una
-              estructura.
-            </p>
+        <div className="reveal" style={{ maxWidth: '62ch' }}>
+          <span className="eyebrow">Validar certificado</span>
+          <h2 className="vtitulo">Toda certificación<br />queda registrada</h2>
+          <p className="vtexto">
+            Las certificaciones de trabajo seguro en alturas se consultan
+            directamente en el portal del <strong>Ministerio del
+            Trabajo</strong>. Verifíquelas antes de subir a nadie a una
+            estructura.
+          </p>
 
-            <a className="cta" href={MINTRABAJO}
-              target="_blank" rel="noopener noreferrer">
+          {/* El sello va dentro del botón: identifica el destino y
+              evita un segundo enlace al mismo sitio. */}
+          <a className="btn-min" href={MINTRABAJO}
+            target="_blank" rel="noopener noreferrer">
+            <img src={`${import.meta.env.BASE_URL}referentes/mintrabajo.png`}
+              alt="" aria-hidden="true" loading="lazy" />
+            <span className="btn-min-txt">
               Consultar en el portal oficial
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
-                <path d="M7 17 17 7M9 7h8v8" />
-              </svg>
-            </a>
-
-            <p className="valida-nota mono">
-              La verificación la emite el Ministerio del Trabajo, no
-              Vertikal. Si el certificado no aparece, llame al 605 440 6984.
-            </p>
-          </div>
-
-          {/* El sello es identificación, no un segundo enlace: el
-              botón ya lleva al portal y duplicar el destino solo
-              genera dudas sobre si van al mismo sitio. */}
-          <figure className="sello reveal">
-            <span className="sello-marco">
-              <img src={`${import.meta.env.BASE_URL}referentes/mintrabajo.png`}
-                alt="Ministerio del Trabajo — República de Colombia"
-                loading="lazy" />
+              <b>app2.mintrabajo.gov.co</b>
             </span>
-            <figcaption className="sello-pie mono">
-              Entidad que certifica<br />
-              <b>Ministerio del Trabajo</b>
-            </figcaption>
-          </figure>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
+              <path d="M7 17 17 7M9 7h8v8" />
+            </svg>
+          </a>
+
+          <p className="valida-nota">
+            La verificación la emite el Ministerio del Trabajo, no Vertikal.
+            Si el certificado no aparece, llame al{' '}
+            <a className="tel-destacado" href={`tel:+57${TEL}`}>605 440 6984</a>.
+          </p>
         </div>
       </section>
 
