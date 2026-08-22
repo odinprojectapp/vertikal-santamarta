@@ -438,6 +438,84 @@ img, svg { display: block; max-width: 100%; }
   height: 12px;
 }
 
+/* ============ REFERENTES ============ */
+.refs { overflow: hidden; }
+
+.marquee {
+  margin-block-start: clamp(38px, 6vh, 64px);
+  /* Los bordes se desvanecen: la cinta parece continuar más allá
+     del viewport en vez de cortarse en seco. */
+  -webkit-mask-image: linear-gradient(90deg,
+    transparent 0, #000 9%, #000 91%, transparent 100%);
+  mask-image: linear-gradient(90deg,
+    transparent 0, #000 9%, #000 91%, transparent 100%);
+}
+.marquee-track { display: flex; width: max-content; }
+.marquee-set {
+  display: flex;
+  animation: desfile 46s linear infinite;
+}
+@keyframes desfile {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-100%, 0, 0); }
+}
+.marquee:hover .marquee-set { animation-play-state: paused; }
+
+.ref {
+  flex: 0 0 auto;
+  margin: 0;
+  inline-size: clamp(190px, 21vw, 260px);
+  padding: clamp(20px, 2.4vw, 30px);
+  border-inline-end: 1px solid var(--grid);
+  background: rgba(14, 16, 18, 0.72);
+  backdrop-filter: blur(4px);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.ref img {
+  block-size: clamp(34px, 4vw, 46px);
+  inline-size: auto;
+  max-inline-size: 100%;
+  object-fit: contain;
+  align-self: flex-start;
+  /* Los logos vienen con fondo blanco: se les da una placa clara
+     para que se lean sobre el fondo oscuro. En gris no compiten
+     con el ámbar de la marca; al pasar el cursor vuelven al color. */
+  padding: 9px 12px;
+  background: rgba(232, 234, 236, 0.9);
+  filter: grayscale(1) contrast(1.05);
+  transition: filter 0.4s var(--exp), background 0.4s var(--exp);
+}
+.ref figcaption { font-family: var(--mono); line-height: 1.5; }
+.ref figcaption b {
+  display: block;
+  font-size: var(--t-sm);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--bone);
+}
+.ref figcaption span {
+  display: block;
+  margin-block-start: 4px;
+  font-size: var(--t-xs);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--bone-3);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ref:hover img { filter: none; background: #fff; }
+}
+
+/* Con movimiento reducido la cinta se detiene y pasa a rejilla:
+   un bucle infinito es exactamente lo que hay que suprimir. */
+@media (prefers-reduced-motion: reduce) {
+  .marquee { -webkit-mask-image: none; mask-image: none; overflow-x: auto; }
+  .marquee-set { animation: none; }
+  .marquee-set[aria-hidden='true'] { display: none; }
+}
+
 /* ============ Contacto ============ */
 .contact { padding-block: clamp(70px, 12vh, 140px); }
 .contact-grid { display: grid; gap: clamp(36px, 6vw, 70px); }

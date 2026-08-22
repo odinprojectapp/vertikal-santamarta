@@ -34,6 +34,7 @@ Su negocio, convertido en interfaz.
 | **Lenis** | Inercia de scroll cinematográfica, sincronizada al ticker de GSAP |
 | **Revelado por línea** | El titular entra línea a línea con máscara de overflow |
 | **Stagger** | Tarjetas escalonadas a 90 ms |
+| **Marquesina infinita** | Referentes en cinta continua, doble copia sin costura |
 
 ## Stack
 
@@ -98,6 +99,29 @@ repositorio cambia de nombre, hay que ajustarlo ahí.
 
 ---
 
+## Referentes — todos verificados
+
+Los siete logos salen de la **biblioteca de medios del propio sitio de
+Vertikal** (`wp-content/uploads/2018/07/`), localizados vía la API REST
+de su WordPress. No se añadió ninguna marca que ellos no publiquen.
+
+| Empresa | Archivo original |
+|---|---|
+| Cerrejón — Minería responsable | `Imagen1.png` |
+| Drummond Ltd. Colombia | `Imagen4.png` |
+| Prodeco | `Imagen5.png` |
+| Ultracem | `Imagen7.jpg` |
+| Komatsu | `Imagen8.png` |
+| Conconcreto | `Imagen15.png` |
+| Constructora Jiménez | `Imagen9.png` |
+
+Su biblioteca contiene además SGS, CompuRedes, Valor S.A., Conciviles,
+McAllister, Soletanche Bachy y Colmena — disponibles si el cliente
+quiere ampliarlos.
+
+> Antes de publicar conviene que el cliente **confirme por escrito** que
+> puede seguir mostrando estas marcas.
+
 ## Datos: qué es real y qué no
 
 **Todo lo mostrado está verificado** en `vertikalsas.com` el 21 de agosto
@@ -125,7 +149,7 @@ confirmar con ellos.
 |---|---|
 | 1 | **Cifra real de personas certificadas** |
 | 2 | **Fotos reales** de sus sedes y operaciones |
-| 3 | **Portafolio de clientes** — su sección "Referentes" está vacía |
+| 3 | ~~Portafolio de clientes~~ — **hecho**: 7 logos tomados de su propia biblioteca de medios |
 | 4 | Confirmar si ya operan bajo la **Resolución 4272 de 2021** (su web cita la 1409 de 2012, derogada) |
 | 5 | Formulario de contacto con backend |
 | 6 | Logo oficial en vectorial |

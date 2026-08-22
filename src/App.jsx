@@ -39,6 +39,20 @@ const CAPAS = [
   },
 ]
 
+/* ============ REFERENTES ============
+   Los siete logos salen de la biblioteca de medios del propio
+   sitio de Vertikal (wp-content/uploads/2018/07). No se
+   añadió ninguna marca que ellos no publiquen. */
+const REFERENTES = [
+  { n: 'Cerrejón',              f: 'cerrejon.png',    d: 'Minería responsable' },
+  { n: 'Drummond Ltd.',         f: 'drummond.png',    d: 'Colombia' },
+  { n: 'Prodeco',               f: 'prodeco.png',     d: 'En pro de Colombia' },
+  { n: 'Ultracem',              f: 'ultracem.jpg',    d: 'Cemento' },
+  { n: 'Komatsu',               f: 'komatsu.png',     d: 'Maquinaria' },
+  { n: 'Conconcreto',           f: 'conconcreto.png', d: 'Constructora' },
+  { n: 'Constructora Jiménez',  f: 'jimenez.png',     d: 'Constructora' },
+]
+
 const CIFRAS = [
   { b: '2009', s: 'Operando desde el 30 de diciembre', ok: true },
   { b: '04', s: 'Departamentos: Magdalena, Cesar, Atlántico, La Guajira', ok: true },
@@ -234,6 +248,39 @@ export default function App() {
               <div className="norm">{c.n}</div>
             </article>
           ))}
+        </div>
+      </section>
+
+      {/* ---------- REFERENTES ---------- */}
+      <section className="chapter refs" id="referentes">
+        <div className="wrap chapter-head reveal">
+          <span className="eyebrow">Referentes</span>
+          <h2>Con quiénes<br />hemos trabajado</h2>
+          <p>
+            Minería, cemento, maquinaria pesada y construcción. Sectores
+            donde una falla en altura no admite segunda oportunidad.
+          </p>
+        </div>
+
+        {/* Marquesina doble: la segunda copia entra justo cuando la
+            primera sale, así el bucle no tiene costura visible. */}
+        <div className="marquee" role="list" aria-label="Empresas referentes">
+          <div className="marquee-track">
+            {[0, 1].map((copia) => (
+              <div className="marquee-set" key={copia} aria-hidden={copia === 1}>
+                {REFERENTES.map((r) => (
+                  <figure className="ref" key={`${copia}-${r.n}`} role="listitem">
+                    <img src={`${import.meta.env.BASE_URL}referentes/${r.f}`}
+                      alt={r.n} loading="lazy" draggable="false" />
+                    <figcaption>
+                      <b>{r.n}</b>
+                      <span>{r.d}</span>
+                    </figcaption>
+                  </figure>
+                ))}
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
