@@ -196,73 +196,111 @@ function Tecnico({ progreso, m }) {
     </group>
   )
 
+  /* Un hueso de A a B: así las piezas encajan de verdad. Antes
+     cada parte se colocaba por separado y el torso quedaba
+     desprendido de la cadera. */
+  const Hueso = ({ mat, a, b, r }) => {
+    const A = new THREE.Vector3(...a)
+    const B = new THREE.Vector3(...b)
+    const d = new THREE.Vector3().subVectors(B, A)
+    const medio = new THREE.Vector3().addVectors(A, B).multiplyScalar(0.5)
+    const q = new THREE.Quaternion().setFromUnitVectors(
+      new THREE.Vector3(0, 1, 0), d.clone().normalize())
+    const e = new THREE.Euler().setFromQuaternion(q)
+    return (
+      <>
+        <mesh material={mat} position={medio.toArray()} rotation={[e.x, e.y, e.z]}>
+          <capsuleGeometry args={[r, d.length(), 4, 10]} />
+        </mesh>
+        <mesh material={mat} position={b}>
+          <sphereGeometry args={[r, 10, 8]} />
+        </mesh>
+      </>
+    )
+  }
+
+  const HOMBRO = 1.40, CADERA = 1.02
+
   return (
     <group ref={g} scale={0.98}>
-      {/* ---- cabeza ---- */}
-      <mesh material={m.piel} position={[0, 1.62, 0.015]}>
-        <sphereGeometry args={[0.113, 14, 14]} />
+      {/* cabeza y casco */}
+      <mesh material={m.piel} position={[0, 1.60, 0.02]}>
+        <sphereGeometry args={[0.108, 18, 14]} />
       </mesh>
-      {/* casco naranja con ala */}
-      <mesh material={m.casco} position={[0, 1.655, 0]}>
-        <sphereGeometry args={[0.132, 16, 14, 0, Math.PI * 2, 0, Math.PI * 0.56]} />
+      <mesh material={m.casco} position={[0, 1.635, 0.02]}>
+        <sphereGeometry args={[0.128, 20, 14, 0, Math.PI * 2, 0, Math.PI * 0.58]} />
       </mesh>
-      <mesh material={m.casco} position={[0, 1.632, 0.03]} rotation={[Math.PI / 2, 0, 0]}>
-        <torusGeometry args={[0.126, 0.021, 8, 18]} />
+      <mesh material={m.casco} position={[0, 1.608, 0.03]} rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[0.12, 0.017, 8, 20]} />
       </mesh>
-      {/* barbuquejo: el casco va sujeto, como exige la norma */}
-      <mesh material={m.arnes} position={[0, 1.545, 0.015]} rotation={[Math.PI / 2, 0, 0]}>
-        <torusGeometry args={[0.108, 0.012, 6, 16]} />
+      <mesh material={m.arnes} position={[0, 1.532, 0.025]} rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[0.098, 0.008, 6, 16]} />
+      </mesh>
+      <Hueso mat={m.piel} a={[0, 1.50, 0.02]} b={[0, 1.44, 0.005]} r={0.045} />
+
+      {/* torso: de hombros a cadera, inclinado hacia atrás */}
+      <Hueso mat={m.camisa} a={[0, 0.06, HOMBRO]} b={[0, -0.02, CADERA]} r={0.155} />
+      <mesh material={m.camisa} position={[0, HOMBRO, 0.06]}>
+        <sphereGeometry args={[0.16, 16, 12]} />
+      </mesh>
+      {/* bandas reflectantes */}
+      <mesh material={m.cable} position={[0, HOMBRO - 0.14, 0.03]} rotation={[0.3, 0, 0]}>
+        <torusGeometry args={[0.158, 0.019, 6, 18]} />
+      </mesh>
+      <mesh material={m.cable} position={[0, CADERA + 0.14, -0.01]} rotation={[0.3, 0, 0]}>
+        <torusGeometry args={[0.152, 0.019, 6, 18]} />
+      </mesh>
+      {/* cintas de pecho en V */}
+      <Hueso mat={m.arnes} a={[0.11, -0.04, HOMBRO - 0.02]} b={[0, -0.07, CADERA + 0.10]} r={0.017} />
+      <Hueso mat={m.arnes} a={[-0.11, -0.04, HOMBRO - 0.02]} b={[0, -0.07, CADERA + 0.10]} r={0.017} />
+
+      {/* cadera: la bisagra que faltaba */}
+      <mesh material={m.pantalon} position={[0, CADERA, -0.02]}>
+        <sphereGeometry args={[0.15, 16, 12]} />
+      </mesh>
+      <mesh material={m.arnes} position={[0, CADERA + 0.015, -0.02]} rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[0.158, 0.03, 8, 20]} />
+      </mesh>
+      <mesh material={m.arnes} position={[0, CADERA + 0.02, -0.215]}>
+        <boxGeometry args={[0.09, 0.11, 0.07]} />
+      </mesh>
+      <mesh material={m.cinta} position={[0, CADERA + 0.02, -0.275]} rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[0.046, 0.013, 8, 16]} />
       </mesh>
 
-      {/* ---- cuello y torso ---- */}
-      <mesh material={m.piel} position={[0, 1.5, 0.01]}>
-        <capsuleGeometry args={[0.045, 0.05, 4, 8]} />
-      </mesh>
-      {/* El torso se inclina hacia atrás: el peso cuelga del arnés */}
-      <group rotation={[0.34, 0, 0]}>
-        <mesh material={m.camisa} position={[0, 1.24, 0.05]}>
-          <capsuleGeometry args={[0.176, 0.34, 6, 12]} />
-        </mesh>
-        {/* cintas del arnés sobre el pecho */}
-        <mesh material={m.arnes} position={[0.075, 1.26, -0.13]} rotation={[0, 0, -0.34]}>
-          <boxGeometry args={[0.042, 0.4, 0.03]} />
-        </mesh>
-        <mesh material={m.arnes} position={[-0.075, 1.26, -0.13]} rotation={[0, 0, 0.34]}>
-          <boxGeometry args={[0.042, 0.4, 0.03]} />
-        </mesh>
-        {/* bandera de Colombia en la manga, como en el logo */}
-        <mesh material={m.casco} position={[0.178, 1.32, 0.02]}>
-          <boxGeometry args={[0.012, 0.05, 0.07]} />
+      {/* piernas: cadera -> rodilla adelante -> tobillo */}
+      {[-1, 1].map((s) => (
+        <group key={s}>
+          <Hueso mat={m.pantalon}
+            a={[s * 0.10, CADERA - 0.02, -0.05]}
+            b={[s * 0.115, CADERA - 0.06, -0.44]} r={0.082} />
+          <Hueso mat={m.pantalon}
+            a={[s * 0.115, CADERA - 0.06, -0.44]}
+            b={[s * 0.115, CADERA - 0.44, -0.60]} r={0.066} />
+          <mesh material={m.arnes} position={[s * 0.115, CADERA - 0.47, -0.655]}
+            rotation={[0.28, 0, 0]}>
+            <boxGeometry args={[0.13, 0.09, 0.22]} />
+          </mesh>
+          <mesh material={m.arnes} position={[s * 0.115, CADERA - 0.045, -0.24]}
+            rotation={[1.4, 0, 0]}>
+            <torusGeometry args={[0.082, 0.02, 6, 14]} />
+          </mesh>
+        </group>
+      ))}
+
+      {/* brazos: hombro -> codo -> mano */}
+      <group ref={brazoFreno}>
+        <Hueso mat={m.manga} a={[0.16, HOMBRO - 0.02, 0.04]} b={[0.235, 1.20, -0.12]} r={0.058} />
+        <Hueso mat={m.manga} a={[0.235, 1.20, -0.12]} b={[0.135, 1.02, -0.29]} r={0.048} />
+        <mesh material={m.guante} position={[0.135, 1.02, -0.29]}>
+          <sphereGeometry args={[0.062, 10, 8]} />
         </mesh>
       </group>
-
-      {/* ---- arnés de cintura + punto de anclaje ---- */}
-      <mesh material={m.arnes} position={[0, 1.0, 0]} rotation={[Math.PI / 2, 0, 0]}>
-        <torusGeometry args={[0.166, 0.038, 8, 18]} />
+      <Hueso mat={m.manga} a={[-0.16, HOMBRO - 0.02, 0.04]} b={[-0.245, 1.24, -0.10]} r={0.058} />
+      <Hueso mat={m.manga} a={[-0.245, 1.24, -0.10]} b={[-0.115, 1.30, -0.30]} r={0.048} />
+      <mesh material={m.guante} position={[-0.115, 1.30, -0.30]}>
+        <sphereGeometry args={[0.062, 10, 8]} />
       </mesh>
-      {/* perneras */}
-      {[-1, 1].map((s) => (
-        <mesh key={s} material={m.arnes} position={[s * 0.12, 0.86, 0]}
-          rotation={[Math.PI / 2, 0, s * 0.2]}>
-          <torusGeometry args={[0.088, 0.026, 6, 14]} />
-        </mesh>
-      ))}
-      {/* mosquetón y descensor sobre la línea de vida */}
-      <mesh material={m.cinta} position={[0, 1.0, -0.2]}>
-        <torusGeometry args={[0.055, 0.016, 8, 14]} />
-      </mesh>
-      <mesh material={m.arnes} position={[0, 1.02, -0.29]}>
-        <boxGeometry args={[0.1, 0.13, 0.07]} />
-      </mesh>
-
-      {/* ---- extremidades ---- */}
-      <Pierna lado={-1} />
-      <Pierna lado={1} />
-      {/* brazo de freno: sujeta la cuerda por debajo de la cadera */}
-      <Brazo lado={1} refHombro={brazoFreno}
-        rotHombro={[0.55, 0, -0.3]} rotCodo={[0.5, 0, 0]} />
-      {/* brazo guía: hacia la línea, por encima del descensor */}
-      <Brazo lado={-1} rotHombro={[-0.62, 0, 0.34]} rotCodo={[-0.5, 0, 0]} />
     </group>
   )
 }

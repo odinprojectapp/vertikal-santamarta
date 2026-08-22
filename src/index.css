@@ -19,10 +19,12 @@
   --bone-2:    #A8AEB4;
   --bone-3:    #6B7278;
 
-  /* Amarillo seguridad — el de su logo y el del arnés */
-  --hazard:     #F2C300;
-  --hazard-hot: #FFD814;
-  --hazard-dim: #8A7100;
+  /* Amarillo EXACTO del logo oficial JFC VERTIKAL SAS, medido
+     sobre el archivo: #FFEB12. Antes se usaba un ámbar industrial
+     genérico (#FFEB12) que chocaba contra el limón del logo. */
+  --hazard:     #FFEB12;
+  --hazard-hot: #FFF45C;
+  --hazard-dim: #8F8400;
 
   /* Rojo solo para el estado de riesgo. Nunca decorativo. */
   --alert: #E5342A;
@@ -482,7 +484,7 @@ img, svg { display: block; max-width: 100%; }
   border: 1px dashed var(--grid-2);
   background: repeating-linear-gradient(
     45deg, transparent, transparent 8px,
-    rgba(242, 195, 0, 0.035) 8px, rgba(242, 195, 0, 0.035) 16px
+    rgba(255, 235, 18, 0.035) 8px, rgba(255, 235, 18, 0.035) 16px
   );
 }
 .pending b { color: var(--bone-3); font-size: clamp(1.4rem, 1.2rem + 1vw, 2rem); }
@@ -576,7 +578,7 @@ img, svg { display: block; max-width: 100%; }
   font-weight: 600;
   letter-spacing: 0.04em;
   white-space: nowrap;
-  border-block-end: 1px solid rgba(242, 195, 0, 0.4);
+  border-block-end: 1px solid rgba(255, 235, 18, 0.4);
   transition: border-color 0.3s var(--exp);
 }
 .tel-destacado:hover { border-block-end-color: var(--hazard); }
@@ -823,7 +825,7 @@ img, svg { display: block; max-width: 100%; }
   .red:hover {
     color: var(--hazard);
     border-color: var(--hazard);
-    background: rgba(242, 195, 0, 0.06);
+    background: rgba(255, 235, 18, 0.06);
     position: relative;
     z-index: 1;
   }
