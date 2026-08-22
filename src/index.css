@@ -1,0 +1,515 @@
+/* ============================================================
+   VERTIKAL — Sistema de diseño
+   Arquetipo: Industrial / Utilitario.
+   El acento amarillo NO es una elección estética arbitraria:
+   es el color de su logo y el del arnés de seguridad.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+:root {
+  /* --- Color. Neutros con sesgo frío de acero, no grises puros --- */
+  --void:      #08090A;
+  --steel-900: #0E1012;
+  --steel-800: #16191C;
+  --steel-700: #1F2429;
+  --grid:      #262C32;
+  --grid-2:    #343C44;
+  --bone:      #E8EAEC;
+  --bone-2:    #A8AEB4;
+  --bone-3:    #6B7278;
+
+  /* Amarillo seguridad — el de su logo y el del arnés */
+  --hazard:     #F2C300;
+  --hazard-hot: #FFD814;
+  --hazard-dim: #8A7100;
+
+  /* Rojo solo para el estado de riesgo. Nunca decorativo. */
+  --alert: #E5342A;
+
+  /* --- Tipografía --- */
+  --display: 'Bebas Neue', Impact, sans-serif;
+  --sans:    'Barlow Condensed', 'Arial Narrow', sans-serif;
+  --mono:    'IBM Plex Mono', monospace;
+
+  /* Acotado tambien por la altura: a 140px el bloque de tres
+     lineas no cabia en un viewport de portatil. */
+  --t-hero: clamp(2.6rem, 1.6rem + 4.6vw, 6.2rem);
+  --t-2xl:  clamp(2.2rem, 1.7rem + 2.6vw, 4.5rem);
+  --t-xl:   clamp(1.6rem, 1.4rem + 1.1vw, 2.4rem);
+  --t-body: clamp(1rem, 0.96rem + 0.24vw, 1.15rem);
+  --t-sm:   clamp(0.82rem, 0.8rem + 0.1vw, 0.9rem);
+  --t-xs:   0.7rem;
+
+  /* --- Movimiento --- */
+  --exp:  cubic-bezier(0.16, 1, 0.3, 1);
+  --snap: cubic-bezier(0.87, 0, 0.13, 1);
+
+  --edge: max(20px, calc((100vw - 1280px) / 2));
+  /* Reserva para el altimetro fijo, que si no se solapa
+     con la ultima columna de las rejillas. */
+  --alt-space: 178px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  /* Lenis controla el scroll; el nativo debe quedarse quieto. */
+  scroll-behavior: auto;
+}
+
+body {
+  margin: 0;
+  background: var(--void);
+  color: var(--bone);
+  font-family: var(--sans);
+  font-size: var(--t-body);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+h1, h2, h3 { margin: 0; font-weight: 400; }
+p { margin: 0; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+a { color: inherit; text-decoration: none; }
+img, svg { display: block; max-width: 100%; }
+
+::selection { background: var(--hazard); color: var(--void); }
+
+:focus-visible {
+  outline: 2px solid var(--hazard);
+  outline-offset: 3px;
+}
+
+/* Grano: rompe la planitud digital. Fijo, nunca dentro del scroll. */
+.grain {
+  position: fixed; inset: 0; z-index: 9999;
+  pointer-events: none; opacity: 0.045;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+}
+
+/* ============ Tipografía utilitaria ============ */
+.mono { font-family: var(--mono); }
+
+.eyebrow {
+  font-family: var(--mono);
+  font-size: var(--t-xs);
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--hazard);
+}
+
+.display {
+  font-family: var(--display);
+  line-height: 0.86;
+  letter-spacing: 0.005em;
+  text-transform: uppercase;
+}
+
+/* ============ Estructura ============ */
+.wrap { padding-inline: var(--edge); }
+
+/* ============ Barra de progreso del descenso ============ */
+.progress {
+  position: fixed; inset-block-start: 0; inset-inline: 0;
+  height: 2px; z-index: 200;
+  background: var(--grid);
+}
+.progress-fill {
+  height: 100%; width: 100%;
+  background: var(--hazard);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+/* ============ ALTÍMETRO — el diferenciador ============
+   No es decoración: marca la altura del descenso y cambia de
+   estado al cruzar 1,80 m, que es donde la norma colombiana
+   empieza a exigir protección contra caídas. */
+.altimeter {
+  position: fixed;
+  inset-inline-end: clamp(12px, 2vw, 28px);
+  inset-block-start: 50%;
+  transform: translateY(-50%);
+  z-index: 150;
+  font-family: var(--mono);
+  text-align: end;
+  pointer-events: none;
+  /* Fondo propio: en difference puro el altimetro se mezclaba
+     con las tarjetas y ambos quedaban ilegibles. */
+  padding: 12px 14px;
+  background: rgba(8, 9, 10, 0.82);
+  backdrop-filter: blur(6px);
+  border-inline-start: 2px solid var(--hazard);
+}
+.alt-value {
+  font-size: clamp(1.6rem, 1.2rem + 1.6vw, 2.6rem);
+  font-weight: 600;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--bone);
+}
+.alt-unit {
+  font-size: var(--t-xs);
+  letter-spacing: 0.2em;
+  color: var(--bone-3);
+  margin-block-start: 4px;
+}
+.alt-rule {
+  margin-block-start: 10px;
+  padding-block-start: 8px;
+  border-block-start: 1px solid var(--grid-2);
+  font-size: var(--t-xs);
+  letter-spacing: 0.12em;
+  line-height: 1.5;
+  color: var(--bone-3);
+  max-width: 15ch;
+  margin-inline-start: auto;
+  transition: color 0.4s var(--exp);
+}
+.altimeter[data-risk='true'] .alt-rule { color: var(--hazard); }
+
+@media (max-width: 780px) {
+  .altimeter { inset-block-start: auto; inset-block-end: 16px; transform: none; }
+  .alt-rule { display: none; }
+}
+
+/* ============ HERO — la torre ============ */
+.tower {
+  position: relative;
+  height: 100vh; height: 100svh;
+  overflow: hidden;
+}
+
+.tower-sky {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(120% 80% at 50% 100%, #1B2026 0%, transparent 60%),
+    linear-gradient(180deg, #0A0C0E 0%, #12161A 55%, #191E23 100%);
+}
+
+/* Capas SVG de la estructura. Cada una se mueve a distinta
+   velocidad: eso es lo que produce la profundidad. */
+.layer {
+  position: absolute; inset-inline: 0; inset-block-end: 0;
+  width: 100%;
+  will-change: transform;
+}
+.layer svg { width: 100%; height: auto; display: block; }
+
+.tower-content {
+  position: absolute;
+  inset-inline-start: var(--edge);
+  inset-inline-end: var(--edge);
+  inset-block-end: clamp(52px, 10vh, 110px);
+  z-index: 20;
+  /* Sin max-width en ch: a este tamaño partiria cada palabra
+     en su propia linea y el bloque desbordaria el viewport. */
+  max-width: min(100%, 900px);
+}
+.tower-title {
+  font-family: var(--display);
+  font-size: var(--t-hero);
+  line-height: 0.84;
+  text-transform: uppercase;
+  margin-block: 18px 0;
+}
+.tower-title em {
+  font-style: normal;
+  color: var(--hazard);
+  display: block;
+}
+.tower-sub {
+  margin-block-start: 20px;
+  color: var(--bone-2);
+  max-width: 34ch;
+  font-size: var(--t-body);
+}
+
+/* La palabra se revela por línea: el overflow hidden es el truco */
+.line-mask { overflow: hidden; display: block; }
+.line-mask > span { display: block; }
+
+.scroll-cue {
+  position: absolute;
+  inset-block-end: 26px; inset-inline-start: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  font-family: var(--mono);
+  font-size: var(--t-xs);
+  letter-spacing: 0.2em;
+  color: var(--bone-3);
+  text-align: center;
+}
+.scroll-cue span {
+  display: block; width: 1px; height: 34px;
+  margin: 10px auto 0;
+  background: linear-gradient(var(--hazard), transparent);
+}
+
+/* ============ Secciones del descenso ============ */
+.chapter {
+  position: relative;
+  padding-block: clamp(80px, 14vh, 160px);
+  border-block-start: 1px solid var(--grid);
+}
+
+.chapter-head { max-width: 62ch; }
+.chapter-head h2 {
+  font-family: var(--display);
+  font-size: var(--t-2xl);
+  line-height: 0.92;
+  text-transform: uppercase;
+  margin-block-start: 14px;
+}
+.chapter-head p {
+  margin-block-start: 20px;
+  color: var(--bone-2);
+  max-width: 56ch;
+}
+
+/* --- Panel pinneado del riesgo --- */
+.risk {
+  position: relative;
+  background: var(--steel-900);
+  border-block: 1px solid var(--grid);
+}
+.risk-pin {
+  height: 100vh; height: 100svh;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  padding-inline: var(--edge);
+}
+.risk-num {
+  font-family: var(--display);
+  font-size: clamp(5rem, 3rem + 14vw, 16rem);
+  line-height: 0.8;
+  color: var(--hazard);
+  font-variant-numeric: tabular-nums;
+}
+.risk-label {
+  font-family: var(--mono);
+  font-size: var(--t-sm);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--bone-2);
+  margin-block-start: 20px;
+  max-width: 40ch;
+  margin-inline: auto;
+}
+.risk-note {
+  margin-block-start: 28px;
+  font-family: var(--mono);
+  font-size: var(--t-xs);
+  letter-spacing: 0.1em;
+  color: var(--bone-3);
+}
+
+/* --- Capas de protección --- */
+.layers-grid {
+  display: grid;
+  gap: 1px;
+  margin-inline-end: 0;
+  background: var(--grid);
+  border: 1px solid var(--grid);
+  margin-block-start: clamp(40px, 7vh, 70px);
+}
+@media (min-width: 860px) {
+  .layers-grid { grid-template-columns: repeat(3, 1fr); }
+}
+/* Solo en escritorio ancho, donde el altimetro es visible.
+   Se acorta la rejilla (margin), no se rellena por dentro
+   (padding): con padding la celda seguia pasando por debajo. */
+@media (min-width: 781px) {
+  .layers-grid,
+  .facts { margin-inline-end: var(--alt-space); }
+  .chapter-head,
+  .contact-grid { padding-inline-end: var(--alt-space); }
+}
+.layer-card {
+  background: var(--steel-900);
+  padding: clamp(24px, 3.5vw, 42px);
+  position: relative;
+  min-height: 260px;
+  display: flex;
+  flex-direction: column;
+  transition: background 0.45s var(--exp);
+}
+.layer-card .ix {
+  font-family: var(--mono);
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em;
+  color: var(--hazard);
+}
+.layer-card h3 {
+  font-family: var(--display);
+  font-size: var(--t-xl);
+  text-transform: uppercase;
+  margin-block-start: 16px;
+  line-height: 1;
+}
+.layer-card p {
+  margin-block-start: 14px;
+  color: var(--bone-2);
+  font-size: var(--t-sm);
+  flex: 1;
+}
+.layer-card .norm {
+  margin-block-start: 22px;
+  padding-block-start: 14px;
+  border-block-start: 1px solid var(--grid);
+  font-family: var(--mono);
+  font-size: var(--t-xs);
+  letter-spacing: 0.1em;
+  color: var(--bone-3);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .layer-card:hover { background: var(--steel-800); }
+}
+
+/* --- Cifras verificadas --- */
+.facts {
+  display: grid;
+  gap: 1px;
+  background: var(--grid);
+  border-block: 1px solid var(--grid);
+}
+@media (min-width: 720px) {
+  .facts { grid-template-columns: repeat(4, 1fr); }
+}
+.fact {
+  background: var(--void);
+  padding: clamp(28px, 4vw, 48px) clamp(20px, 2.5vw, 32px);
+}
+.fact b {
+  display: block;
+  font-family: var(--display);
+  font-size: clamp(2.4rem, 1.8rem + 3vw, 4.2rem);
+  line-height: 0.9;
+  color: var(--bone);
+  font-variant-numeric: tabular-nums;
+  font-weight: 400;
+}
+.fact span {
+  display: block;
+  margin-block-start: 12px;
+  font-family: var(--mono);
+  font-size: var(--t-xs);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--bone-3);
+  line-height: 1.5;
+}
+
+/* Marca de dato pendiente. Visible a propósito: es honestidad,
+   no un descuido. */
+.pending {
+  border: 1px dashed var(--grid-2);
+  background: repeating-linear-gradient(
+    45deg, transparent, transparent 8px,
+    rgba(242, 195, 0, 0.035) 8px, rgba(242, 195, 0, 0.035) 16px
+  );
+}
+.pending b { color: var(--bone-3); font-size: clamp(1.4rem, 1.2rem + 1vw, 2rem); }
+
+/* ============ Franja de advertencia ============ */
+.hazard-strip {
+  background: repeating-linear-gradient(
+    -45deg, var(--hazard) 0 22px, var(--void) 22px 44px
+  );
+  height: 12px;
+}
+
+/* ============ Contacto ============ */
+.contact { padding-block: clamp(70px, 12vh, 140px); }
+.contact-grid { display: grid; gap: clamp(36px, 6vw, 70px); }
+@media (min-width: 900px) {
+  .contact-grid { grid-template-columns: 1.1fr 0.9fr; }
+}
+.contact h2 {
+  font-family: var(--display);
+  font-size: var(--t-2xl);
+  text-transform: uppercase;
+  line-height: 0.92;
+}
+.contact-list { margin-block-start: 30px; }
+.contact-list a, .contact-list div {
+  display: block;
+  padding-block: 14px;
+  border-block-end: 1px solid var(--grid);
+  font-family: var(--mono);
+  font-size: var(--t-sm);
+  letter-spacing: 0.06em;
+  transition: color 0.3s var(--exp), padding-inline-start 0.3s var(--exp);
+}
+.contact-list a:hover { color: var(--hazard); padding-inline-start: 10px; }
+.contact-list .k {
+  display: block;
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--bone-3);
+  margin-block-end: 5px;
+}
+
+.cta {
+  display: inline-flex; align-items: center; gap: 12px;
+  margin-block-start: 34px;
+  padding: 17px 30px;
+  background: var(--hazard);
+  color: var(--void);
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: var(--t-sm);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: background 0.25s var(--exp), transform 0.15s var(--exp);
+  will-change: transform;
+}
+.cta:hover  { background: var(--hazard-hot); }
+.cta:active { transform: scale(0.975); }
+
+/* ============ Pie ============ */
+.foot {
+  border-block-start: 1px solid var(--grid);
+  padding-block: 34px;
+  font-family: var(--mono);
+  font-size: var(--t-xs);
+  letter-spacing: 0.1em;
+  color: var(--bone-3);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 28px;
+  justify-content: space-between;
+}
+
+/* ============ Aviso de demo ============ */
+.demo-tag {
+  position: fixed;
+  inset-block-end: 14px; inset-inline-start: 14px;
+  z-index: 300;
+  padding: 8px 14px;
+  background: var(--steel-800);
+  border: 1px solid var(--grid-2);
+  font-family: var(--mono);
+  font-size: var(--t-xs);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--bone-3);
+}
+@media (max-width: 780px) { .demo-tag { display: none; } }
+
+/* ============ Movimiento reducido ============
+   Se retira el desplazamiento grande y los bucles, pero se
+   conservan los fundidos: apagar todo dejaría la página
+   con contenido invisible. */
+@media (prefers-reduced-motion: reduce) {
+  .layer { transform: none !important; }
+  .scroll-cue span { display: none; }
+  html { scroll-behavior: auto; }
+}
