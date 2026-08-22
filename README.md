@@ -108,16 +108,14 @@ El portal del Ministerio del Trabajo
 **no acepta parámetros por URL**, así que no se puede preconsultar
 desde aquí ni incrustar el resultado.
 
-Lo que sí se puede: **preparar la consulta**. El módulo valida el
-documento según su tipo, lo copia al portapapeles y abre el portal
-oficial. El usuario solo pega.
+Por eso el módulo **solo enlaza**: el sello institucional del
+Ministerio y un botón al portal. Poner aquí un formulario obligaría a
+escribir el documento dos veces —una en la landing y otra en el portal—
+sin ganar nada.
 
-- Los 7 tipos de documento son los oficiales del portal
-- Cédula, tarjeta y registro civil aceptan solo dígitos; pasaporte y
-  permisos aceptan letras y las pasan a mayúsculas
-- Si el portapapeles falla (permiso denegado), el portal se abre igual
+- El sello es el oficial del propio portal (`images/todos-pais.png`)
 - Se declara explícitamente que **la verificación la emite el
-  Ministerio, no Vertikal**
+  Ministerio, no Vertikal**, con el teléfono si el certificado no aparece
 
 ## Valores corporativos — textuales
 
