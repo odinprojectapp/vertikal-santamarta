@@ -332,13 +332,15 @@ function Escena({ progreso, reduce }) {
   const mats = useMemo(() => ({
     acero: new THREE.MeshStandardMaterial({ color: '#9FAAB6', roughness: 0.5, metalness: 0.75 }),
     cable: new THREE.MeshStandardMaterial({ color: '#D8DEE4', roughness: 0.35, metalness: 0.85 }),
-    /* Paleta tomada del logo oficial JFC VERTIKAL SAS: camisa
-       blanca, casco naranja, pantalón caqui, guantes verde lima. */
-    camisa: new THREE.MeshStandardMaterial({ color: '#F0F2F4', roughness: 0.86 }),
-    manga: new THREE.MeshStandardMaterial({ color: '#1A1D21', roughness: 0.85 }),
-    pantalon: new THREE.MeshStandardMaterial({ color: '#B39770', roughness: 0.9 }),
-    casco: new THREE.MeshStandardMaterial({ color: '#E08A16', roughness: 0.35, metalness: 0.2 }),
-    guante: new THREE.MeshStandardMaterial({ color: '#B4E01E', roughness: 0.7 }),
+    /* Uniforme real, tomado de su foto de portada en Google:
+       overol naranja de alta visibilidad y casco blanco Petzl.
+       Antes seguíamos el logo (casco naranja, camisa blanca), pero
+       la foto de su propio equipo manda sobre la ilustración. */
+    camisa: new THREE.MeshStandardMaterial({ color: '#E8621A', roughness: 0.82 }),
+    manga: new THREE.MeshStandardMaterial({ color: '#C94E10', roughness: 0.84 }),
+    pantalon: new THREE.MeshStandardMaterial({ color: '#E8621A', roughness: 0.85 }),
+    casco: new THREE.MeshStandardMaterial({ color: '#F2F4F6', roughness: 0.3, metalness: 0.1 }),
+    guante: new THREE.MeshStandardMaterial({ color: '#1B1E22', roughness: 0.8 }),
     arnes: new THREE.MeshStandardMaterial({ color: '#1B1E22', roughness: 0.72 }),
     cinta: new THREE.MeshStandardMaterial({ color: '#2E7DD1', roughness: 0.7 }),
     piel: new THREE.MeshStandardMaterial({ color: '#C89268', roughness: 0.9 }),
