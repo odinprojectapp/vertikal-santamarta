@@ -468,6 +468,7 @@ img, svg { display: block; max-width: 100%; }
    oscuro, con la misma gramática de 1px del resto. */
 .sello {
   display: block;
+  margin: 0;
   inline-size: min(100%, 330px);
   border: 1px solid var(--grid-2);
   background: rgba(14, 16, 18, 0.9);
@@ -495,10 +496,6 @@ img, svg { display: block; max-width: 100%; }
   border-block-start: 1px solid var(--grid);
 }
 .sello-pie b { color: var(--hazard); font-weight: 600; }
-
-@media (hover: hover) and (pointer: fine) {
-  .sello:hover { border-color: var(--hazard); transform: translateY(-3px); }
-}
 
 .valida-nota {
   margin-block-start: 22px;

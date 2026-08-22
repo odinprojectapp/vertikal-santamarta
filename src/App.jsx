@@ -402,19 +402,20 @@ export default function App() {
             </p>
           </div>
 
-          <a className="sello reveal" href={MINTRABAJO}
-            target="_blank" rel="noopener noreferrer"
-            aria-label="Abrir el portal de consulta del Ministerio del Trabajo">
+          {/* El sello es identificación, no un segundo enlace: el
+              botón ya lleva al portal y duplicar el destino solo
+              genera dudas sobre si van al mismo sitio. */}
+          <figure className="sello reveal">
             <span className="sello-marco">
               <img src={`${import.meta.env.BASE_URL}referentes/mintrabajo.png`}
                 alt="Ministerio del Trabajo — República de Colombia"
                 loading="lazy" />
             </span>
-            <span className="sello-pie mono">
-              Consulta oficial<br />
-              <b>app2.mintrabajo.gov.co ↗</b>
-            </span>
-          </a>
+            <figcaption className="sello-pie mono">
+              Entidad que certifica<br />
+              <b>Ministerio del Trabajo</b>
+            </figcaption>
+          </figure>
         </div>
       </section>
 
