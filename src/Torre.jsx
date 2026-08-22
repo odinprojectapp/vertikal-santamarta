@@ -330,7 +330,12 @@ function Camara({ progreso, reduce }) {
 /* ---------- Escena ---------- */
 function Escena({ progreso, reduce }) {
   const mats = useMemo(() => ({
-    acero: new THREE.MeshStandardMaterial({ color: '#9FAAB6', roughness: 0.5, metalness: 0.75 }),
+    /* Acero galvanizado pintado: rugosidad alta, metalicidad baja.
+       Con metalness 0.75 se comportaba como cromo y reflejaba un
+       entorno que no existe, de ahí el aspecto de maqueta. */
+    acero: new THREE.MeshStandardMaterial({
+      color: '#B8433A', roughness: 0.72, metalness: 0.15,
+    }),
     cable: new THREE.MeshStandardMaterial({ color: '#D8DEE4', roughness: 0.35, metalness: 0.85 }),
     /* Uniforme real, tomado de su foto de portada en Google:
        overol naranja de alta visibilidad y casco blanco Petzl.
@@ -356,9 +361,17 @@ function Escena({ progreso, reduce }) {
       <fog attach="fog" args={['#12171C', 22, 165]} />
       <color attach="background" args={['#12171C']} />
 
-      <hemisphereLight args={['#9FB4C8', '#0E1216', 2.2]} />
-      <directionalLight position={[30, ALTO_TOTAL * 1.2, 22]} intensity={3} color="#FFF4DC" />
-      <directionalLight position={[-24, ALTO_TOTAL * 0.4, -16]} intensity={0.9} color="#7FA0C8" />
+      {/* Cielo arriba, suelo abajo: es lo que da la sensación de
+          exterior. Antes eran tres luces planas y el acero parecía
+          plástico. */}
+      <hemisphereLight args={['#A8C4E0', '#2A2620', 1.5]} />
+      {/* Sol: una sola direccional fuerte crea el contraste que
+          define los perfiles metálicos. */}
+      <directionalLight position={[38, ALTO_TOTAL * 1.3, 26]}
+        intensity={3.6} color="#FFF2D8" />
+      {/* Rebote frío del cielo por el lado opuesto, muy tenue. */}
+      <directionalLight position={[-30, ALTO_TOTAL * 0.3, -20]}
+        intensity={0.55} color="#8FB2DC" />
 
       <Celosia material={mats.acero} />
       <Antenas acero={mats.acero} baliza={mats.baliza} />
@@ -374,7 +387,13 @@ export default function Torre({ progreso, reduce }) {
   return (
     <Canvas
       dpr={[1, 1.75]}
-      gl={{ antialias: true, powerPreference: 'high-performance' }}
+      gl={{
+        antialias: true, powerPreference: 'high-performance',
+        /* ACESFilmic comprime altas luces como una cámara real:
+           sin él, el metal iluminado se quema a blanco plano. */
+        toneMapping: THREE.ACESFilmicToneMapping,
+        toneMappingExposure: 1.15,
+      }}
       camera={{ fov: 46, near: 0.5, far: 480, position: [20, ALTO_TOTAL, 28] }}
       style={{ position: 'absolute', inset: 0 }}
     >

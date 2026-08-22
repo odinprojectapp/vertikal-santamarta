@@ -523,6 +523,10 @@ export default function App() {
 
       <header className="tower">
         <div className="tower-content">
+          <img className="logo-hero"
+            src={`${import.meta.env.BASE_URL}logo-jfc.png`}
+            alt="JFC Vertikal SAS — Trabajo seguro en alturas"
+            width="96" height="96" />
           <span className="eyebrow">Vertikal · Santa Marta</span>
           <h1 className="tower-title">
             <span className="line-mask"><span>Cuando</span></span>
@@ -712,7 +716,11 @@ export default function App() {
         </div>
 
         <footer className="foot">
-          <span>VERTIKAL · Trabajo seguro en alturas</span>
+          <span className="foot-marca">
+            <img src={`${import.meta.env.BASE_URL}logo-jfc.png`}
+              alt="" aria-hidden="true" width="34" height="34" />
+            VERTIKAL · Trabajo seguro en alturas
+          </span>
           <span>Demostración — no es el sitio oficial</span>
         </footer>
       </section>

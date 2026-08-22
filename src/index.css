@@ -829,6 +829,24 @@ img, svg { display: block; max-width: 100%; }
   }
 }
 
+/* El logo oficial del cliente, que faltaba por completo. */
+.logo-hero {
+  inline-size: clamp(64px, 8vw, 96px);
+  block-size: auto;
+  margin-block-end: 20px;
+  filter: drop-shadow(0 4px 18px rgba(0, 0, 0, 0.55));
+}
+.foot-marca {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+.foot-marca img {
+  inline-size: 34px;
+  block-size: 34px;
+  opacity: 0.85;
+}
+
 /* ============ Pie ============ */
 .foot {
   border-block-start: 1px solid var(--grid);
