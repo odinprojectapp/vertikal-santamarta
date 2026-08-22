@@ -152,19 +152,48 @@ function Icono({ tipo }) {
   return <svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true">{svg}</svg>
 }
 
-/* ---------- Tarjeta de servicio ----------
-   El detalle se despliega al pasar el cursor (o al enfocar con
-   teclado). La altura se anima sobre el contenido medido, no
-   sobre 'auto', que no es animable. */
-function Servicio({ c }) {
-  const panel = useRef(null)
-  const lista = useRef(null)
-  const [abierto, setAbierto] = useState(false)
+/* ---------- Servicios: acordeón en columna ----------
+   No es una rejilla de tarjetas: en 2x2, al abrir una la vecina se
+   estiraba 261px de hueco vacío porque la rejilla iguala alturas de
+   fila. En columna el detalle se abre entre filas, sin arrastrar a
+   nadie, y cada fila ocupa lo que necesita.
+
+   Solo una abierta a la vez: mantiene la sección compacta y evita
+   que el contenido de abajo salte varias veces seguidas. */
+function Servicios({ items }) {
+  const [activo, setActivo] = useState(null)
   const reduce = useRef(false)
 
   useEffect(() => {
     reduce.current = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    /* En táctil no hay cursor: se abre la primera para que el
+       contenido no quede escondido tras un gesto inexistente. */
+    if (window.matchMedia('(hover: none)').matches) setActivo(0)
   }, [])
+
+  /* El cierre se controla al salir del grupo entero, no de cada
+     fila: al recorrer con el ratón, el mouseleave de una llegaba
+     después del mouseenter de la siguiente y quedaban dos abiertas. */
+  const salir = (e) => {
+    if (!e.currentTarget.contains(e.relatedTarget)) setActivo(null)
+  }
+
+  return (
+    <div className="servicios" onMouseLeave={salir}>
+      {items.map((c, i) => (
+        <Fila key={c.ix} c={c} i={i}
+          abierto={activo === i}
+          reduce={reduce}
+          abrir={() => setActivo(i)}
+          alternar={() => setActivo((v) => (v === i ? null : i))} />
+      ))}
+    </div>
+  )
+}
+
+function Fila({ c, abierto, reduce, abrir, alternar }) {
+  const panel = useRef(null)
+  const lista = useRef(null)
 
   useEffect(() => {
     const el = panel.current
@@ -174,37 +203,31 @@ function Servicio({ c }) {
     animate(el, {
       height: abierto ? alto : 0,
       opacity: abierto ? 1 : 0,
-      duration: reduce.current ? 200 : 480,
+      duration: reduce.current ? 180 : 420,
       ease: 'out(3)',
     })
 
     if (abierto && lista.current) {
-      /* Los puntos entran escalonados: comunica que son varios
-         servicios distintos, no un bloque de texto. */
       animate(lista.current.querySelectorAll('li'), {
         opacity: [0, 1],
-        x: reduce.current ? 0 : [-10, 0],
-        duration: reduce.current ? 200 : 420,
-        delay: stagger(reduce.current ? 0 : 45),
+        x: reduce.current ? 0 : [-8, 0],
+        duration: reduce.current ? 180 : 380,
+        delay: stagger(reduce.current ? 0 : 40),
         ease: 'out(3)',
       })
     }
-  }, [abierto])
+  }, [abierto, reduce])
 
   return (
-    <article
-      className={`serv${abierto ? ' on' : ''}`}
-      onMouseEnter={() => setAbierto(true)}
-      onMouseLeave={() => setAbierto(false)}
-      onFocus={() => setAbierto(true)}
-      onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) setAbierto(false) }}
-    >
-      <button className="serv-cab" aria-expanded={abierto}
-        onClick={() => setAbierto((v) => !v)}>
+    <article className={`serv${abierto ? ' on' : ''}`} onMouseEnter={abrir}>
+      <button className="serv-cab" aria-expanded={abierto} onClick={alternar}>
         <span className="serv-ico"><Icono tipo={c.icono} /></span>
-        <span className="serv-ix mono">/ {c.ix}</span>
-        <h3>{c.t}</h3>
-        <p className="serv-res">{c.d}</p>
+        <span className="serv-tex">
+          <span className="serv-ix mono">/ {c.ix}</span>
+          <h3>{c.t}</h3>
+          <span className="serv-res">{c.d}</span>
+        </span>
+        <span className="serv-mas" aria-hidden="true" />
       </button>
 
       <div className="serv-panel" ref={panel} aria-hidden={!abierto}>
@@ -475,9 +498,7 @@ export default function App() {
           </p>
         </div>
 
-        <div className="servicios">
-          {CAPAS.map((c) => <Servicio c={c} key={c.ix} />)}
-        </div>
+        <Servicios items={CAPAS} />
       </section>
 
       {/* ---------- VALORES ---------- */}
