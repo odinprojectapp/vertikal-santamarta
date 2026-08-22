@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Lenis from 'lenis'
+import Torre from './Torre.jsx'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -45,54 +46,25 @@ const CIFRAS = [
   { b: 'Pendiente', s: 'Personas certificadas — dato por confirmar', ok: false },
 ]
 
-/* ============ Torre en SVG ============
-   Tres capas a distinta profundidad. Se dibujan una vez y solo
-   se les anima el transform: nunca se regeneran por frame. */
-function Estructura({ profundidad }) {
-  const o = { 1: 0.22, 2: 0.45, 3: 1 }[profundidad]
-  const trazo = { 1: 1.2, 2: 1.6, 3: 2.2 }[profundidad]
-  const color = profundidad === 3 ? '#2E353C' : '#1C2126'
-
-  return (
-    <svg viewBox="0 0 1200 700" preserveAspectRatio="xMidYMax slice"
-      style={{ opacity: o }} aria-hidden="true">
-      <g stroke={color} strokeWidth={trazo} fill="none" strokeLinecap="square">
-        {/* Montantes: anchos abajo (700), estrechos arriba (40).
-            La perspectiva de una torre vista desde su base. */}
-        <path d="M300 700 L470 40" />
-        <path d="M900 700 L730 40" />
-        {/* Travesaños: el ancho se interpola con la misma razón
-            que los montantes, si no la estructura no cierra. */}
-        {Array.from({ length: 11 }, (_, i) => {
-          const t = i / 10
-          const y = 700 - t * 660
-          const x1 = 300 + t * 170
-          const x2 = 900 - t * 170
-          return <path key={`h${i}`} d={`M${x1} ${y} L${x2} ${y}`} />
-        })}
-        {/* Diagonales alternadas — cruz de San Andrés */}
-        {Array.from({ length: 10 }, (_, i) => {
-          const t1 = i / 10, t2 = (i + 1) / 10
-          const y1 = 700 - t1 * 660, y2 = 700 - t2 * 660
-          const a1 = 300 + t1 * 170, b1 = 900 - t1 * 170
-          const a2 = 300 + t2 * 170, b2 = 900 - t2 * 170
-          return i % 2 === 0
-            ? <path key={`d${i}`} d={`M${a1} ${y1} L${b2} ${y2}`} />
-            : <path key={`d${i}`} d={`M${b1} ${y1} L${a2} ${y2}`} />
-        })}
-      </g>
-    </svg>
-  )
-}
-
 export default function App() {
   const raiz = useRef(null)
   const barra = useRef(null)
+  /* El progreso vive en una ref, no en estado: se escribe en cada
+     tick del scroll y un setState por frame provocaria un render
+     de React por frame. La escena 3D lo lee dentro de useFrame. */
+  const progreso = useRef(0)
   const [metros, setMetros] = useState(ALTURA_MAX)
+  const [reduce3d, setReduce3d] = useState(false)
   const enRiesgo = metros > UMBRAL_M
 
   useEffect(() => {
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    /* ?motion=on fuerza la animación completa aunque el sistema
+       pida movimiento reducido. Sirve para enseñar el demo desde
+       un equipo con esa preferencia activada. */
+    const forzar = new URLSearchParams(location.search).get('motion') === 'on'
+    const reduce = !forzar &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    setReduce3d(reduce)
 
     /* Lenis da la inercia cinematográfica. Con movimiento reducido
        no se instancia: el scroll nativo es el comportamiento correcto. */
@@ -117,6 +89,9 @@ export default function App() {
       ScrollTrigger.create({
         trigger: document.body, start: 'top top', end: 'bottom bottom', scrub: true,
         onUpdate: (self) => {
+          /* Una sola fuente de verdad: el mismo progreso mueve la
+             camara, el altimetro y la barra. */
+          progreso.current = self.progress
           setMetros(+(ALTURA_MAX * (1 - self.progress)).toFixed(1))
         },
       })
@@ -133,15 +108,6 @@ export default function App() {
         { opacity: 1, duration: 0.9, delay: 0.75, ease: 'power2.out' })
 
       if (!reduce) {
-        /* --- Parallax: cada capa a su velocidad. Eso es la profundidad. --- */
-        const vel = { 1: -8, 2: -20, 3: -42 }
-        gsap.utils.toArray('.layer').forEach((el) => {
-          gsap.to(el, {
-            yPercent: vel[el.dataset.z], ease: 'none',
-            scrollTrigger: { trigger: '.tower', start: 'top top', end: 'bottom top', scrub: 1 },
-          })
-        })
-
         /* --- El panel del riesgo se queda fijo mientras cuenta --- */
         ScrollTrigger.create({
           trigger: '.risk', start: 'top top', end: '+=110%', pin: '.risk-pin', pinSpacing: true,
@@ -203,12 +169,13 @@ export default function App() {
       </aside>
 
       {/* ---------- TORRE ---------- */}
-      <header className="tower">
-        <div className="tower-sky" />
-        <div className="layer" data-z="1"><Estructura profundidad={1} /></div>
-        <div className="layer" data-z="2"><Estructura profundidad={2} /></div>
-        <div className="layer" data-z="3"><Estructura profundidad={3} /></div>
+      {/* La torre 3D es el fondo de TODO el descenso, no solo del
+          hero: por eso va fija detras del contenido. */}
+      <div className="escena">
+        <Torre progreso={progreso} reduce={reduce3d} />
+      </div>
 
+      <header className="tower">
         <div className="tower-content">
           <span className="eyebrow">Vertikal · Santa Marta</span>
           <h1 className="tower-title">
@@ -325,6 +292,16 @@ export default function App() {
       </section>
 
       <div className="demo-tag">Demo · Vertikal</div>
+
+      {/* Si el sistema pide movimiento reducido, la animación se
+          desactiva. Se avisa en pantalla porque si no parece que
+          el descenso simplemente no funciona. */}
+      {reduce3d && (
+        <a className="motion-note" href="?motion=on">
+          Movimiento reducido activo en tu navegador ·
+          <b> Ver el descenso animado →</b>
+        </a>
+      )}
     </div>
   )
 }

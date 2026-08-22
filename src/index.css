@@ -177,28 +177,30 @@ img, svg { display: block; max-width: 100%; }
   .alt-rule { display: none; }
 }
 
-/* ============ HERO — la torre ============ */
+/* ============ ESCENA 3D ============
+   Fija detras de todo: la camara desciende por la torre durante
+   el recorrido completo, no solo en el hero. */
+.escena {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.escena canvas { display: block; }
+
+/* Todo el contenido va por encima de la escena. */
+.tower, .risk, .chapter, .hazard-strip, .contact { position: relative; z-index: 1; }
+
+/* ============ HERO ============ */
 .tower {
-  position: relative;
   height: 100vh; height: 100svh;
   overflow: hidden;
+  /* Degradado inferior: asienta el titular sobre la torre sin
+     taparla. Sin esto el texto compite con la estructura. */
+  background: linear-gradient(180deg,
+    rgba(8,9,10,0.55) 0%, rgba(8,9,10,0) 32%,
+    rgba(8,9,10,0.12) 62%, rgba(8,9,10,0.88) 100%);
 }
-
-.tower-sky {
-  position: absolute; inset: 0;
-  background:
-    radial-gradient(120% 80% at 50% 100%, #1B2026 0%, transparent 60%),
-    linear-gradient(180deg, #0A0C0E 0%, #12161A 55%, #191E23 100%);
-}
-
-/* Capas SVG de la estructura. Cada una se mueve a distinta
-   velocidad: eso es lo que produce la profundidad. */
-.layer {
-  position: absolute; inset-inline: 0; inset-block-end: 0;
-  width: 100%;
-  will-change: transform;
-}
-.layer svg { width: 100%; height: auto; display: block; }
 
 .tower-content {
   position: absolute;
@@ -252,7 +254,6 @@ img, svg { display: block; max-width: 100%; }
 
 /* ============ Secciones del descenso ============ */
 .chapter {
-  position: relative;
   padding-block: clamp(80px, 14vh, 160px);
   border-block-start: 1px solid var(--grid);
 }
@@ -273,8 +274,9 @@ img, svg { display: block; max-width: 100%; }
 
 /* --- Panel pinneado del riesgo --- */
 .risk {
-  position: relative;
-  background: var(--steel-900);
+  /* Translucido: la torre sigue descendiendo detras del panel. */
+  background: rgba(10, 12, 14, 0.82);
+  backdrop-filter: blur(3px);
   border-block: 1px solid var(--grid);
 }
 .risk-pin {
@@ -331,7 +333,8 @@ img, svg { display: block; max-width: 100%; }
   .contact-grid { padding-inline-end: var(--alt-space); }
 }
 .layer-card {
-  background: var(--steel-900);
+  background: rgba(14, 16, 18, 0.9);
+  backdrop-filter: blur(6px);
   padding: clamp(24px, 3.5vw, 42px);
   position: relative;
   min-height: 260px;
@@ -383,7 +386,8 @@ img, svg { display: block; max-width: 100%; }
   .facts { grid-template-columns: repeat(4, 1fr); }
 }
 .fact {
-  background: var(--void);
+  background: rgba(8, 9, 10, 0.88);
+  backdrop-filter: blur(6px);
   padding: clamp(28px, 4vw, 48px) clamp(20px, 2.5vw, 32px);
 }
 .fact b {
@@ -504,12 +508,28 @@ img, svg { display: block; max-width: 100%; }
 }
 @media (max-width: 780px) { .demo-tag { display: none; } }
 
+.motion-note {
+  position: fixed;
+  inset-block-end: 14px; inset-inline: 50%;
+  transform: translateX(-50%);
+  z-index: 300;
+  width: max-content; max-width: calc(100vw - 28px);
+  padding: 10px 18px;
+  background: var(--steel-800);
+  border: 1px solid var(--hazard);
+  font-family: var(--mono);
+  font-size: var(--t-xs);
+  letter-spacing: 0.1em;
+  color: var(--bone-2);
+  text-align: center;
+}
+.motion-note b { color: var(--hazard); }
+
 /* ============ Movimiento reducido ============
    Se retira el desplazamiento grande y los bucles, pero se
    conservan los fundidos: apagar todo dejaría la página
    con contenido invisible. */
 @media (prefers-reduced-motion: reduce) {
-  .layer { transform: none !important; }
   .scroll-cue span { display: none; }
   html { scroll-behavior: auto; }
 }

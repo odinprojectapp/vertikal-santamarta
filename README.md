@@ -29,7 +29,8 @@ Su negocio, convertido en interfaz.
 |---|---|
 | **Scrubbing** | El altímetro y la barra de progreso avanzan exactamente con el scroll |
 | **Pinning** | El panel del umbral (1,8 m) queda fijo mientras el contador sube |
-| **Parallax por capas** | Tres capas SVG de la torre a velocidades distintas (−8%, −20%, −42%) |
+| **Cámara scrub 3D** | La cámara desciende por dentro de la torre; el scroll es su playhead |
+| **Instancing** | ~700 barras de acero en 2 draw calls |
 | **Lenis** | Inercia de scroll cinematográfica, sincronizada al ticker de GSAP |
 | **Revelado por línea** | El titular entra línea a línea con máscara de overflow |
 | **Stagger** | Tarjetas escalonadas a 90 ms |
@@ -39,17 +40,38 @@ Su negocio, convertido en interfaz.
 - **React 19** + **Vite 8**
 - **GSAP 3 + ScrollTrigger** — todo el scroll
 - **Lenis** — scroll suave
-- SVG dibujado por código, sin imágenes externas
-- **112 KB gzip** · sin dependencias de iconos
+- **Three.js + React Three Fiber** — la torre 3D
+- Geometría generada por código, sin modelos externos
+- **347 KB gzip** · 60 fps medidos
 
-### Por qué SVG y no Three.js
+### El descenso en WebGL
 
-Se evaluó WebGL. Se descartó a propósito: el público objetivo entra
-desde celulares de gama media en Santa Marta. SVG + GSAP da el mismo
-impacto narrativo a 112 KB con 60 fps garantizados, frente a ~600 KB y
-riesgo real de caída de frames.
+La torre es una estructura 3D real (Three.js + React Three Fiber) y la
+cámara **desciende por dentro** de ella: los montantes pasan a los
+lados y los niveles se alejan en perspectiva. Ese recorrido interior es
+lo que produce la sensación de descender — una torre vista desde fuera
+solo se desplaza, no se atraviesa.
 
-Si el cliente lo pide, la versión 3D es viable sobre esta misma base.
+**Rendimiento:** las ~700 barras van en dos `InstancedMesh` (un draw
+call cada uno). Medido: **60 fps** estables. Con un `Mesh` por barra
+serían cientos de draw calls y caería a ~20 fps.
+
+Coste: **347 KB gzip** frente a los 112 KB de la versión SVG previa.
+Es el precio real de WebGL y se asumió a propósito.
+
+### ⚠️ Si no ves la animación
+
+Si tu navegador o sistema tiene activado **"reducir movimiento"**, la
+página muestra a propósito una vista fija exterior y avisa en pantalla
+con un enlace.
+
+Para ver el descenso sin cambiar la configuración del sistema:
+
+```
+?motion=on
+```
+
+Ejemplo: `https://odinprojectapp.github.io/vertikal-santamarta/?motion=on`
 
 ## Desarrollo
 
