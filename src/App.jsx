@@ -57,6 +57,24 @@ const REFERENTES = [
    Textuales de su página valores-corporativos. Las frases están
    dentro de imágenes en su sitio, así que Google no las indexa:
    aquí van como texto real. */
+/* ============ VALIDAR CERTIFICADO ============
+   El portal del Ministerio es ASP.NET WebForms con POST y
+   __VIEWSTATE: NO acepta parámetros por URL, así que no se puede
+   preconsultar desde aquí. Lo que sí se puede es preparar los
+   datos, validarlos y dejar al usuario listo para pegarlos.
+   Verificado el 22-08-2026 en app2.mintrabajo.gov.co */
+const MINTRABAJO = 'https://app2.mintrabajo.gov.co/CentrosEntrenamiento/consulta_ext.aspx'
+
+const TIPOS_DOC = [
+  { v: 'CC', t: 'Cédula de ciudadanía' },
+  { v: 'CE', t: 'Cédula de extranjería' },
+  { v: 'PA', t: 'Pasaporte' },
+  { v: 'PE', t: 'Permiso especial de permanencia' },
+  { v: 'PP', t: 'Permiso por protección temporal' },
+  { v: 'RC', t: 'Registro civil' },
+  { v: 'TI', t: 'Tarjeta de identidad' },
+]
+
 const VALORES = [
   { ix: '01', t: 'Trabajo en equipo', d: 'Potenciamos el esfuerzo.' },
   { ix: '02', t: 'Equilibrio',        d: 'Establecemos relaciones de ganar-ganar.' },
@@ -72,6 +90,119 @@ const CIFRAS = [
   { b: '02', s: 'Sedes de entrenamiento propias', ok: true },
   { b: 'Pendiente', s: 'Personas certificadas — dato por confirmar', ok: false },
 ]
+
+/* ============ Validar certificado ============
+   No consulta: prepara. El portal del Ministerio no admite
+   parámetros por URL, así que este módulo valida el documento,
+   lo copia al portapapeles y abre el portal — el usuario solo
+   tiene que pegar. Es la diferencia entre "aquí tiene un enlace"
+   y "ya le dejé el dato listo". */
+function ValidarCertificado() {
+  const [tipo, setTipo] = useState('CC')
+  const [doc, setDoc] = useState('')
+  const [error, setError] = useState('')
+  const [copiado, setCopiado] = useState(false)
+
+  /* Solo dígitos para los documentos numéricos; pasaporte y
+     permisos admiten letras. */
+  const soloNumero = ['CC', 'TI', 'RC'].includes(tipo)
+
+  const limpiar = (v) =>
+    soloNumero ? v.replace(/\D/g, '') : v.replace(/[^A-Za-z0-9]/g, '').toUpperCase()
+
+  const validar = () => {
+    const v = doc.trim()
+    if (!v) return 'Escribe el número de documento.'
+    if (soloNumero && v.length < 5) return 'El número parece incompleto.'
+    if (v.length > 20) return 'El número es demasiado largo.'
+    return ''
+  }
+
+  const abrir = async () => {
+    const err = validar()
+    setError(err)
+    if (err) return
+
+    /* Se copia primero y se abre después: si el portapapeles
+       falla, el usuario igual llega al portal. */
+    try {
+      await navigator.clipboard.writeText(doc.trim())
+      setCopiado(true)
+      setTimeout(() => setCopiado(false), 4000)
+    } catch {
+      /* Sin permiso de portapapeles no se interrumpe el flujo. */
+    }
+    window.open(MINTRABAJO, '_blank', 'noopener,noreferrer')
+  }
+
+  const etiqueta = TIPOS_DOC.find((t) => t.v === tipo)?.t || ''
+
+  return (
+    <div className="valida">
+      <div className="valida-form">
+        <label className="campo">
+          <span className="clabel">Tipo de documento</span>
+          <select value={tipo} onChange={(e) => { setTipo(e.target.value); setDoc(''); setError('') }}>
+            {TIPOS_DOC.map((t) => <option key={t.v} value={t.v}>{t.t}</option>)}
+          </select>
+        </label>
+
+        <label className="campo">
+          <span className="clabel">Número de documento</span>
+          <input
+            type="text"
+            inputMode={soloNumero ? 'numeric' : 'text'}
+            value={doc}
+            onChange={(e) => { setDoc(limpiar(e.target.value)); setError('') }}
+            onKeyDown={(e) => { if (e.key === 'Enter') abrir() }}
+            placeholder={soloNumero ? '1 090 000 000' : 'AB123456'}
+            aria-invalid={!!error}
+            aria-describedby={error ? 'err-doc' : undefined}
+            maxLength={20}
+          />
+        </label>
+
+        <button className="cta" onClick={abrir}>
+          Consultar en MinTrabajo
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
+            <path d="M7 17 17 7M9 7h8v8" />
+          </svg>
+        </button>
+      </div>
+
+      {error && (
+        <p className="valida-err mono" id="err-doc" role="alert">▲ {error}</p>
+      )}
+      {copiado && !error && (
+        <p className="valida-ok mono" role="status">
+          ✓ Documento copiado. Pégalo en el campo del Ministerio.
+        </p>
+      )}
+
+      <ol className="pasos">
+        <li>
+          <b>01</b>
+          Escribe el documento aquí. Lo copiamos por ti.
+        </li>
+        <li>
+          <b>02</b>
+          Se abre el portal del <strong>Ministerio del Trabajo</strong> en
+          otra pestaña.
+        </li>
+        <li>
+          <b>03</b>
+          Selecciona «{etiqueta}», pega el número y consulta.
+        </li>
+      </ol>
+
+      <p className="valida-nota mono">
+        La verificación la emite el Ministerio del Trabajo, no Vertikal.
+        Si no aparece el certificado, llama al 605 440 6984.
+      </p>
+    </div>
+  )
+}
 
 /* ============ Marquesina ============
    El desplazamiento se hace por JS y no con animación CSS: si el
@@ -364,6 +495,21 @@ export default function App() {
             </li>
           ))}
         </ol>
+      </section>
+
+      {/* ---------- VALIDAR CERTIFICADO ---------- */}
+      <section className="chapter wrap valida-sec" id="validar">
+        <div className="chapter-head reveal">
+          <span className="eyebrow">Validar certificado</span>
+          <h2>Compruebe una<br />certificación en 30&nbsp;segundos</h2>
+          <p>
+            Toda certificación de trabajo en alturas queda registrada ante
+            el Ministerio del Trabajo. Verifíquela antes de subir a nadie
+            a una estructura.
+          </p>
+        </div>
+
+        <ValidarCertificado />
       </section>
 
       {/* ---------- REFERENTES ---------- */}

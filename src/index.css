@@ -438,6 +438,113 @@ img, svg { display: block; max-width: 100%; }
   height: 12px;
 }
 
+/* ============ VALIDAR CERTIFICADO ============ */
+.valida {
+  margin-block-start: clamp(34px, 5vh, 56px);
+  max-width: 900px;
+}
+.valida-form {
+  display: grid;
+  gap: 1px;
+  background: var(--grid);
+  border: 1px solid var(--grid);
+}
+@media (min-width: 780px) {
+  /* La primera columna algo mas ancha: "Permiso especial de
+     permanencia" no cabia y quedaba cortado. */
+  .valida-form { grid-template-columns: 1.15fr 1fr auto; align-items: stretch; }
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: clamp(16px, 2vw, 22px);
+  background: rgba(14, 16, 18, 0.92);
+  backdrop-filter: blur(6px);
+}
+.clabel {
+  font-family: var(--mono);
+  font-size: var(--t-xs);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--bone-3);
+}
+.campo select,
+.campo input {
+  appearance: none;
+  inline-size: 100%;
+  padding: 10px 0;
+  border: 0;
+  border-block-end: 1px solid var(--grid-2);
+  background: transparent;
+  color: var(--bone);
+  font-family: var(--mono);
+  font-size: var(--t-sm);
+  letter-spacing: 0.02em;
+  border-radius: 0;
+  text-overflow: ellipsis;
+  transition: border-color 0.3s var(--exp);
+}
+.campo select { cursor: pointer; }
+.campo select option { background: var(--steel-800); color: var(--bone); }
+.campo input::placeholder { color: var(--bone-3); opacity: 0.55; }
+.campo select:focus,
+.campo input:focus { outline: none; border-block-end-color: var(--hazard); }
+.campo input[aria-invalid='true'] { border-block-end-color: var(--alert); }
+
+/* El botón ocupa toda su celda: en la rejilla es una columna más. */
+.valida-form .cta {
+  margin: 0;
+  justify-content: center;
+  border-radius: 0;
+  padding-inline: clamp(22px, 3vw, 36px);
+}
+
+.valida-err, .valida-ok {
+  margin-block-start: 14px;
+  font-size: var(--t-xs);
+  letter-spacing: 0.1em;
+}
+.valida-err { color: var(--alert); }
+.valida-ok  { color: var(--hazard); }
+
+.pasos {
+  list-style: none;
+  margin: clamp(28px, 4vh, 44px) 0 0;
+  padding: 0;
+  display: grid;
+  gap: 1px;
+  background: var(--grid);
+  border: 1px solid var(--grid);
+}
+@media (min-width: 720px) { .pasos { grid-template-columns: repeat(3, 1fr); } }
+.pasos li {
+  background: rgba(8, 9, 10, 0.86);
+  padding: clamp(18px, 2.2vw, 26px);
+  font-size: var(--t-sm);
+  color: var(--bone-2);
+  line-height: 1.55;
+}
+.pasos b {
+  display: block;
+  font-family: var(--mono);
+  font-size: var(--t-xs);
+  letter-spacing: 0.18em;
+  color: var(--hazard);
+  margin-block-end: 10px;
+}
+.pasos strong { color: var(--bone); font-weight: 600; }
+
+.valida-nota {
+  margin-block-start: 22px;
+  font-size: var(--t-xs);
+  letter-spacing: 0.08em;
+  line-height: 1.7;
+  color: var(--bone-3);
+  max-width: 62ch;
+}
+
 /* ============ VALORES CORPORATIVOS ============
    Lista, no rejilla de tarjetas: seis filas separadas por una línea
    de 1px que se traza sola al entrar en pantalla. */

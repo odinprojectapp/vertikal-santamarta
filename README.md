@@ -100,6 +100,25 @@ repositorio cambia de nombre, hay que ajustarlo ahí.
 
 ---
 
+## Validar certificado
+
+El portal del Ministerio del Trabajo
+(`app2.mintrabajo.gov.co/CentrosEntrenamiento/consulta_ext.aspx`) es
+**ASP.NET WebForms con POST y `__VIEWSTATE`**: verificado el 22-08-2026,
+**no acepta parámetros por URL**, así que no se puede preconsultar
+desde aquí ni incrustar el resultado.
+
+Lo que sí se puede: **preparar la consulta**. El módulo valida el
+documento según su tipo, lo copia al portapapeles y abre el portal
+oficial. El usuario solo pega.
+
+- Los 7 tipos de documento son los oficiales del portal
+- Cédula, tarjeta y registro civil aceptan solo dígitos; pasaporte y
+  permisos aceptan letras y las pasan a mayúsculas
+- Si el portapapeles falla (permiso denegado), el portal se abre igual
+- Se declara explícitamente que **la verificación la emite el
+  Ministerio, no Vertikal**
+
 ## Valores corporativos — textuales
 
 Los seis valores y sus frases salen de su página `valores-corporativos`.
