@@ -34,12 +34,14 @@ Su negocio, convertido en interfaz.
 | **Lenis** | Inercia de scroll cinematográfica, sincronizada al ticker de GSAP |
 | **Revelado por línea** | El titular entra línea a línea con máscara de overflow |
 | **Stagger** | Tarjetas escalonadas a 90 ms |
+| **Despliegue de servicios** | Anime.js: la altura se anima sobre el contenido medido y los ítems entran escalonados a 45 ms |
 | **Filas escalonadas** | Valores: cada fila con su propio trigger; la línea inferior se traza con `scaleX` |
 | **Marquesina infinita** | Referentes en cinta continua movida por `requestAnimationFrame`, doble copia sin costura |
 
 ## Stack
 
 - **React 19** + **Vite 8**
+- **Anime.js 4** (MIT) — solo para el despliegue de servicios
 - **GSAP 3 + ScrollTrigger** — todo el scroll
 - **Lenis** — scroll suave
 - **Three.js + React Three Fiber** — la torre 3D

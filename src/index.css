@@ -320,68 +320,103 @@ img, svg { display: block; max-width: 100%; }
   color: var(--bone-3);
 }
 
-/* --- Capas de protección --- */
-.layers-grid {
+/* --- Servicios: se despliegan al pasar el cursor --- */
+.servicios {
   display: grid;
   gap: 1px;
-  margin-inline-end: 0;
   background: var(--grid);
   border: 1px solid var(--grid);
   margin-block-start: clamp(40px, 7vh, 70px);
 }
-@media (min-width: 860px) {
-  .layers-grid { grid-template-columns: repeat(3, 1fr); }
+@media (min-width: 900px) {
+  .servicios { grid-template-columns: repeat(2, 1fr); }
 }
-/* Solo en escritorio ancho, donde el altimetro es visible.
-   Se acorta la rejilla (margin), no se rellena por dentro
-   (padding): con padding la celda seguia pasando por debajo. */
-@media (min-width: 781px) {
-  .layers-grid,
-  .facts { margin-inline-end: var(--alt-space); }
-  .chapter-head,
-  .contact-grid { padding-inline-end: var(--alt-space); }
-}
-.layer-card {
+
+.serv {
   background: rgba(14, 16, 18, 0.9);
   backdrop-filter: blur(6px);
-  padding: clamp(24px, 3.5vw, 42px);
-  position: relative;
-  min-height: 260px;
-  display: flex;
-  flex-direction: column;
-  transition: background 0.45s var(--exp);
+  transition: background 0.4s var(--exp);
 }
-.layer-card .ix {
-  font-family: var(--mono);
+.serv.on { background: rgba(22, 25, 28, 0.95); }
+
+.serv-cab {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px clamp(16px, 2vw, 22px);
+  inline-size: 100%;
+  padding: clamp(24px, 3vw, 34px);
+  text-align: start;
+  cursor: pointer;
+}
+.serv-ico {
+  grid-row: 1 / span 3;
+  color: var(--hazard);
+  padding-block-start: 2px;
+  transition: transform 0.45s var(--exp);
+}
+.serv.on .serv-ico { transform: translateY(-2px) scale(1.06); }
+
+.serv-ix {
   font-size: var(--t-xs);
   letter-spacing: 0.18em;
-  color: var(--hazard);
+  color: var(--bone-3);
 }
-.layer-card h3 {
+.serv-cab h3 {
   font-family: var(--display);
-  font-size: var(--t-xl);
-  text-transform: uppercase;
-  margin-block-start: 16px;
+  font-size: clamp(1.3rem, 1.1rem + 0.9vw, 1.8rem);
   line-height: 1;
+  text-transform: uppercase;
+  color: var(--bone);
 }
-.layer-card p {
-  margin-block-start: 14px;
-  color: var(--bone-2);
+.serv-res {
+  margin-block-start: 8px;
   font-size: var(--t-sm);
-  flex: 1;
+  color: var(--bone-2);
+  max-width: 42ch;
 }
-.layer-card .norm {
-  margin-block-start: 22px;
-  padding-block-start: 14px;
+
+/* El panel arranca cerrado; JS anima su altura sobre el contenido
+   medido, porque 'auto' no es animable. */
+.serv-panel {
+  height: 0;
+  opacity: 0;
+  overflow: hidden;
+}
+.serv-panel ul {
+  list-style: none;
+  margin: 0;
+  padding: 0 clamp(24px, 3vw, 34px) clamp(24px, 3vw, 34px)
+           calc(clamp(24px, 3vw, 34px) + 30px + clamp(16px, 2vw, 22px));
+}
+.serv-panel li {
+  position: relative;
+  padding-block: 7px;
+  padding-inline-start: 18px;
+  font-size: var(--t-sm);
+  color: var(--bone-2);
   border-block-start: 1px solid var(--grid);
+}
+.serv-panel li::before {
+  content: '';
+  position: absolute;
+  inset-inline-start: 0; inset-block-start: 15px;
+  inline-size: 7px; block-size: 1px;
+  background: var(--hazard);
+}
+.serv-panel .serv-nota {
+  margin-block-start: 6px;
   font-family: var(--mono);
   font-size: var(--t-xs);
   letter-spacing: 0.1em;
   color: var(--bone-3);
 }
+.serv-panel .serv-nota::before { background: var(--grid-2); }
 
-@media (hover: hover) and (pointer: fine) {
-  .layer-card:hover { background: var(--steel-800); }
+/* Sin cursor (táctil) el panel queda siempre visible: en móvil no
+   hay hover y esconder el contenido tras un gesto que no existe
+   sería inaccesible. */
+@media (hover: none) {
+  .serv-panel { height: auto !important; opacity: 1 !important; }
 }
 
 /* --- Cifras verificadas --- */

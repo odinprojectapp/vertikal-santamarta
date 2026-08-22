@@ -3,6 +3,7 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Lenis from 'lenis'
 import Torre from './Torre.jsx'
+import { animate, stagger } from 'animejs'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -18,26 +19,66 @@ const MAIL = 'info@vertikal.com.co' // ✓ verificado
 const UMBRAL_M = 1.8
 const ALTURA_MAX = 42
 
+/* ============ SERVICIOS ============
+   Los cuatro que su web lista, con el detalle textual de cada uno.
+   Los iconos son SVG de trazo, dibujados para este proyecto: un
+   arnés, un pozo, una grúa y una línea de vida. */
 const CAPAS = [
   {
     ix: '01',
-    t: 'Formación certificada',
-    d: 'Niveles básico, avanzado y coordinador de trabajos en alturas. Base de entrenamiento con entornos que simulan el área real de trabajo.',
+    t: 'Formación especializada',
+    d: 'Certificación aprobada por el Ministerio del Trabajo.',
+    items: [
+      'Trabajo en alturas',
+      'Espacios confinados',
+      'Rescate vertical',
+      'Andamios multidireccionales',
+    ],
     n: 'Sedes: Santa Marta · La Mina — Cerrejón',
+    icono: 'arnes',
   },
   {
     ix: '02',
-    t: 'Espacios confinados',
-    d: 'Permiso de acceso requerido y persona competente. Soporte, equipos de acceso, acompañamiento y actividades de rescate.',
-    n: 'Marco: OSHA 1910.146',
+    t: 'Gerencia del riesgo asociado',
+    d: 'Acompañamiento técnico antes, durante y después de la tarea.',
+    items: [
+      'Peer review y gerenciamiento del riesgo',
+      'Elaboración de planes y procedimientos de alto riesgo',
+      'Diseño y configuración de sistemas de protección contra caídas',
+      'Supervisión, consultoría e interventoría',
+    ],
+    n: 'Trabajo seguro en alturas y espacios confinados',
+    icono: 'escudo',
   },
   {
     ix: '03',
+    t: 'Labores especializadas',
+    d: 'Ejecución directa de tareas en altura con personal certificado.',
+    items: [
+      'Lavado de silos, fachadas y ventanería',
+      'Pinturas y trabajos en exteriores',
+      'Montaje y desmontaje de antenas de comunicaciones',
+      'Limpieza de cámaras y tanques',
+      'Instalación de antenas de cable satelital',
+    ],
+    n: 'Personal propio, equipos propios',
+    icono: 'grua',
+  },
+  {
+    ix: '04',
     t: 'Sistemas de ingeniería',
-    d: 'Líneas de vida verticales y horizontales, puntos de anclaje y redes anticaídas. Venta, diseño, inspección, instalación y certificación.',
+    d: 'Venta, diseño, inspección, instalación y certificación.',
+    items: [
+      'Líneas de vida verticales',
+      'Líneas de vida horizontales',
+      'Puntos de anclaje',
+      'Redes anticaídas',
+    ],
     n: 'Incluye memorias de cálculo estructural',
+    icono: 'linea',
   },
 ]
+
 
 /* ============ REFERENTES ============
    Los siete logos salen de la biblioteca de medios del propio
@@ -80,6 +121,101 @@ const CIFRAS = [
   { b: '02', s: 'Sedes de entrenamiento propias', ok: true },
   { b: 'Pendiente', s: 'Personas certificadas — dato por confirmar', ok: false },
 ]
+
+/* ---------- Iconos de servicio ----------
+   Trazo, no relleno: heredan currentColor y se ven nítidos a
+   cualquier tamaño sin cargar una librería de iconos. */
+function Icono({ tipo }) {
+  const p = { fill: 'none', stroke: 'currentColor', strokeWidth: 1.6,
+    strokeLinecap: 'round', strokeLinejoin: 'round' }
+  const svg = {
+    /* arnés: cinturón con perneras y anclaje dorsal */
+    arnes: <><circle cx="12" cy="4.2" r="2.1" {...p} />
+      <path d="M12 6.3v4.4M7.4 9.2 12 10.7l4.6-1.5" {...p} />
+      <path d="M6.8 12.4h10.4M8.2 12.4l-1.4 7M15.8 12.4l1.4 7" {...p} />
+      <path d="M12 10.7v3.1" {...p} /></>,
+    /* espacios confinados: boca de pozo con descenso */
+    escudo: <><ellipse cx="12" cy="5.4" rx="7" ry="2.4" {...p} />
+      <path d="M5 5.4v3.1c0 1.3 3.1 2.4 7 2.4s7-1.1 7-2.4V5.4" {...p} />
+      <path d="M12 11v9.4M9.4 20.4h5.2" {...p} />
+      <circle cx="12" cy="15.2" r="1.5" {...p} /></>,
+    /* grúa / labores en altura */
+    grua: <><path d="M4 20.4h16M6.4 20.4V4.6h11.2" {...p} />
+      <path d="M6.4 4.6 17.6 9.4M17.6 4.6v4.8" {...p} />
+      <path d="M13.4 6.4v4.2M11.6 10.6h3.6v3.4h-3.6z" {...p} /></>,
+    /* línea de vida vertical con anclajes */
+    linea: <><path d="M12 3.2v17.6" {...p} />
+      <circle cx="12" cy="4.4" r="1.5" {...p} />
+      <circle cx="12" cy="19.6" r="1.5" {...p} />
+      <path d="M7.6 8.6h8.8M7.6 12h8.8M7.6 15.4h8.8" {...p} /></>,
+  }[tipo]
+  return <svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true">{svg}</svg>
+}
+
+/* ---------- Tarjeta de servicio ----------
+   El detalle se despliega al pasar el cursor (o al enfocar con
+   teclado). La altura se anima sobre el contenido medido, no
+   sobre 'auto', que no es animable. */
+function Servicio({ c }) {
+  const panel = useRef(null)
+  const lista = useRef(null)
+  const [abierto, setAbierto] = useState(false)
+  const reduce = useRef(false)
+
+  useEffect(() => {
+    reduce.current = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  }, [])
+
+  useEffect(() => {
+    const el = panel.current
+    if (!el) return
+    const alto = lista.current ? lista.current.offsetHeight : 0
+
+    animate(el, {
+      height: abierto ? alto : 0,
+      opacity: abierto ? 1 : 0,
+      duration: reduce.current ? 200 : 480,
+      ease: 'out(3)',
+    })
+
+    if (abierto && lista.current) {
+      /* Los puntos entran escalonados: comunica que son varios
+         servicios distintos, no un bloque de texto. */
+      animate(lista.current.querySelectorAll('li'), {
+        opacity: [0, 1],
+        x: reduce.current ? 0 : [-10, 0],
+        duration: reduce.current ? 200 : 420,
+        delay: stagger(reduce.current ? 0 : 45),
+        ease: 'out(3)',
+      })
+    }
+  }, [abierto])
+
+  return (
+    <article
+      className={`serv${abierto ? ' on' : ''}`}
+      onMouseEnter={() => setAbierto(true)}
+      onMouseLeave={() => setAbierto(false)}
+      onFocus={() => setAbierto(true)}
+      onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) setAbierto(false) }}
+    >
+      <button className="serv-cab" aria-expanded={abierto}
+        onClick={() => setAbierto((v) => !v)}>
+        <span className="serv-ico"><Icono tipo={c.icono} /></span>
+        <span className="serv-ix mono">/ {c.ix}</span>
+        <h3>{c.t}</h3>
+        <p className="serv-res">{c.d}</p>
+      </button>
+
+      <div className="serv-panel" ref={panel} aria-hidden={!abierto}>
+        <ul ref={lista}>
+          {c.items.map((i) => <li key={i}>{i}</li>)}
+          <li className="serv-nota">{c.n}</li>
+        </ul>
+      </div>
+    </article>
+  )
+}
 
 /* ============ Marquesina ============
    El desplazamiento se hace por JS y no con animación CSS: si el
@@ -339,15 +475,8 @@ export default function App() {
           </p>
         </div>
 
-        <div className="layers-grid">
-          {CAPAS.map((c) => (
-            <article className="layer-card" key={c.ix}>
-              <span className="ix">/ {c.ix}</span>
-              <h3>{c.t}</h3>
-              <p>{c.d}</p>
-              <div className="norm">{c.n}</div>
-            </article>
-          ))}
+        <div className="servicios">
+          {CAPAS.map((c) => <Servicio c={c} key={c.ix} />)}
         </div>
       </section>
 
