@@ -22,7 +22,7 @@
   /* Amarillo EXACTO del logo oficial JFC VERTIKAL SAS, medido
      sobre el archivo: #FFEB12. Antes se usaba un ámbar industrial
      genérico (#FFEB12) que chocaba contra el limón del logo. */
-  --hazard:     #FFEB12;
+  --hazard:     #FFF200;
   --hazard-hot: #FFF45C;
   --hazard-dim: #8F8400;
 
@@ -189,6 +189,12 @@ img, svg { display: block; max-width: 100%; }
   pointer-events: none;
 }
 .escena canvas { display: block; }
+.descenso {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  transition: opacity 0.6s var(--exp);
+}
 
 /* Todo el contenido va por encima de la escena. */
 .tower, .risk, .chapter, .hazard-strip, .contact { position: relative; z-index: 1; }
@@ -833,10 +839,10 @@ img, svg { display: block; max-width: 100%; }
 
 /* El logo oficial del cliente, que faltaba por completo. */
 .logo-hero {
-  inline-size: clamp(64px, 8vw, 96px);
+  inline-size: clamp(210px, 24vw, 300px);
   block-size: auto;
-  margin-block-end: 20px;
-  filter: drop-shadow(0 4px 18px rgba(0, 0, 0, 0.55));
+  margin-block-end: 22px;
+  filter: drop-shadow(0 6px 22px rgba(0, 0, 0, 0.6));
 }
 .foot-marca {
   display: inline-flex;

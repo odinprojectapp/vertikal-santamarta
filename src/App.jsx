@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Lenis from 'lenis'
-import Torre from './Torre.jsx'
+import Descenso from './Descenso.jsx'
 import { animate, stagger } from 'animejs'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -518,15 +518,18 @@ export default function App() {
       {/* La torre 3D es el fondo de TODO el descenso, no solo del
           hero: por eso va fija detras del contenido. */}
       <div className="escena">
-        <Torre progreso={progreso} reduce={reduce3d} />
+        <Descenso progreso={progreso} />
       </div>
 
       <header className="tower">
         <div className="tower-content">
+          {/* Logotipo horizontal vectorizado: el texto es SVG real,
+              así escala sin pixelarse. El emblema circular va
+              incrustado porque es una fotografía tramada. */}
           <img className="logo-hero"
-            src={`${import.meta.env.BASE_URL}logo-jfc.png`}
-            alt="JFC Vertikal SAS — Trabajo seguro en alturas"
-            width="96" height="96" />
+            src={`${import.meta.env.BASE_URL}logo-vertikal.svg`}
+            alt="VERTIKAL — Trabajo seguro en alturas"
+            width="300" height="58" />
           <span className="eyebrow">Vertikal · Santa Marta</span>
           <h1 className="tower-title">
             <span className="line-mask"><span>Cuando</span></span>
