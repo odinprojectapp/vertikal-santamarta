@@ -853,15 +853,14 @@ export default function App() {
           <span>Demostración — no es el sitio oficial</span>
         </footer>
 
-        {/* Créditos obligatorios: ambos modelos son CC Attribution,
-            que exige acreditar al autor. Sin esto se incumple la
-            licencia. */}
+        {/* Crédito obligatorio: la torre es CC BY y exige acreditar al
+            autor. El operario se rehízo con MakeHuman, que es CC0 y no
+            requiere atribución, así que su crédito anterior se retiró
+            junto con el modelo que sustituye. */}
         <p className="creditos mono">
-          Modelos 3D bajo licencia CC BY 4.0 ·
-          Torre: <a href="https://sketchfab.com/3d-models/telecommunication-tower-low-poly-free-39bee442b9aa4c3d8dc7674453cd78ad"
-            target="_blank" rel="noopener noreferrer">Telecommunication Tower Low-Poly Free</a> por Nicholas-3D ·
-          Figura: <a href="https://sketchfab.com/3d-models/lowpoly-human-rigged-99217f23d0b74600b882795c41c13ca0"
-            target="_blank" rel="noopener noreferrer">Lowpoly Human (Rigged)</a> por void
+          Torre 3D: <a href="https://sketchfab.com/3d-models/telecommunication-tower-low-poly-free-39bee442b9aa4c3d8dc7674453cd78ad"
+            target="_blank" rel="noopener noreferrer">Telecommunication Tower Low-Poly Free</a> por
+          Nicholas-3D, CC BY 4.0 · Operario modelado con MakeHuman (CC0)
         </p>
       </section>
 
