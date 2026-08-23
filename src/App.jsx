@@ -456,11 +456,19 @@ export default function App() {
       /* --- El remate del eslogan entra al empezar a descender ---
              Primero se lee el reto; la respuesta llega cuando el
              visitante ya está bajando. */
+      /* Entra ya con la carga, no oculto del todo: si el visitante
+         no baja, el eslogan quedaba a medias y esa es la frase que
+         más identifica a la empresa. El scroll solo termina de
+         asentarlo. */
+      gsap.from('.remate b', {
+        yPercent: 108, opacity: 0,
+        duration: 1.05, delay: 0.62, ease: 'power4.out',
+      })
       gsap.fromTo('.remate b',
-        { yPercent: 105, opacity: 0 },
-        { yPercent: 0, opacity: 1, ease: 'none',
+        { filter: 'blur(3px)' },
+        { filter: 'blur(0px)', ease: 'none',
           scrollTrigger: {
-            trigger: '.tower', start: 'top top', end: '28% top', scrub: 0.6,
+            trigger: '.tower', start: 'top top', end: '22% top', scrub: 0.5,
           } })
 
       /* --- Entrada del hero: revelado por línea --- */
