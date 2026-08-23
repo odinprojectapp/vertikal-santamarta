@@ -131,6 +131,25 @@ const VALORES = [
   { ix: '06', t: 'Respeto',           d: 'Entendemos tus necesidades, las apropiamos como nuestras.' },
 ]
 
+/* ============ NIVELES DEL DESCENSO ============
+   Seis actividades reales, cada una a su altura. Las fotos son de
+   su galería de Google: quedan como marcador hasta que el cliente
+   autorice usarlas. */
+const NIVELES = [
+  { m: 42, k: 'torre-antenas', t: 'Sistemas de ingeniería',
+    d: 'Instalación y certificación de antenas y estructuras en altura.' },
+  { m: 34, k: 'formacion', t: 'Formación certificada',
+    d: 'Niveles básico, avanzado y coordinador. Aprobado por el Ministerio.' },
+  { m: 26, k: 'rescate-vertical', t: 'Rescate vertical',
+    d: 'Maniobras con trípode, camilla y sistemas de izaje.' },
+  { m: 18, k: 'espacios-confinados', t: 'Espacios confinados',
+    d: 'Permiso de acceso requerido, equipos de respiración y rescate.' },
+  { m: 10, k: 'labores-altura', t: 'Labores especializadas',
+    d: 'Fachadas, silos, antenas y limpieza de tanques.' },
+  { m: 0,  k: 'sede', t: 'Santa Marta',
+    d: 'Centro de entrenamiento propio. Operando desde 2009.' },
+]
+
 const CIFRAS = [
   { b: '2009', s: 'Operando desde el 30 de diciembre', ok: true },
   { b: '04', s: 'Departamentos: Magdalena, Cesar, Atlántico, La Guajira', ok: true },
@@ -638,6 +657,37 @@ export default function App() {
             <a className="tel-destacado" href={`tel:+57${TEL}`}>605 440 6984</a>.
           </p>
         </div>
+      </section>
+
+      {/* ---------- NIVELES ---------- */}
+      <section className="chapter wrap niveles" id="niveles">
+        <div className="chapter-head reveal">
+          <span className="eyebrow">El descenso</span>
+          <h2>Seis alturas,<br />seis operaciones</h2>
+          <p>
+            Cada metro del descenso corresponde a una actividad real de
+            Vertikal.
+          </p>
+        </div>
+
+        <ol className="nlista">
+          {NIVELES.map((n) => (
+            <li className="nivel reveal" key={n.k}>
+              <div className="nivel-foto">
+                {/* Marcador: sustituir por la foto real cuando el
+                    cliente autorice el uso de su galería. */}
+                <span className="nivel-pend mono">
+                  Foto pendiente<br /><b>{n.k}</b>
+                </span>
+              </div>
+              <div className="nivel-tx">
+                <span className="nivel-m mono">{n.m} m</span>
+                <h3>{n.t}</h3>
+                <p>{n.d}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
       </section>
 
       {/* ---------- REFERENTES ---------- */}
