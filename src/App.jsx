@@ -630,10 +630,10 @@ export default function App() {
       <section className="chapter wrap">
         <div className="chapter-head reveal">
           <span className="eyebrow">Qué hacemos</span>
-          <h2>Tres capas<br />entre el riesgo<br />y su gente</h2>
+          <h2>Formamos, asesoramos,<br />ejecutamos y certificamos</h2>
           <p>
-            Cada una responde a un marco normativo distinto. Ninguna
-            reemplaza a la otra.
+            Cuatro servicios, cuatro marcos normativos. Ninguno
+            reemplaza al otro.
           </p>
         </div>
 
@@ -732,11 +732,10 @@ export default function App() {
       {/* ---------- NIVELES ---------- */}
       <section className="chapter wrap niveles" id="niveles">
         <div className="chapter-head reveal">
-          <span className="eyebrow">El descenso</span>
-          <h2>Seis alturas,<br />seis operaciones</h2>
+          <span className="eyebrow">Nuestras operaciones</span>
+          <h2>Seis frentes<br />de trabajo</h2>
           <p>
-            Cada metro del descenso corresponde a una actividad real de
-            Vertikal.
+            Fotos reales de su equipo en obra. Ninguna imagen de banco.
           </p>
         </div>
 
