@@ -466,13 +466,17 @@ img, svg { display: block; max-width: 100%; }
 }
 .serv-cab h3 {
   font-family: var(--display);
-  font-size: clamp(1.2rem, 1rem + 0.8vw, 1.65rem);
+  /* Sube el tope: a 1.65rem el titulo se perdia en pantallas grandes */
+  font-size: clamp(1.3rem, 1rem + 1.15vw, 2.15rem);
   line-height: 1;
   text-transform: uppercase;
   color: var(--bone);
 }
 .serv-res {
-  font-size: var(--t-sm);
+  /* La descripcion iba en --t-sm (0.9rem tope) y en escritorio
+     quedaba diminuta al lado del titulo. */
+  font-size: clamp(0.9rem, 0.84rem + 0.3vw, 1.12rem);
+  line-height: 1.55;
   color: var(--bone-2);
   max-width: 52ch;
 }
@@ -512,9 +516,9 @@ img, svg { display: block; max-width: 100%; }
 }
 .serv-panel li {
   position: relative;
-  padding-block: 7px;
+  padding-block: 8px;
   padding-inline-start: 17px;
-  font-size: var(--t-sm);
+  font-size: clamp(0.88rem, 0.82rem + 0.28vw, 1.06rem);
   color: var(--bone-2);
 }
 .serv-panel li::before {
@@ -1319,4 +1323,80 @@ img, svg { display: block; max-width: 100%; }
   font-size: var(--t-xs);
   letter-spacing: 0.1em;
   color: var(--bone-3);
+}
+
+/* ============ ENVÍO DEL FORMULARIO ============ */
+
+.boton-envio { position: relative; overflow: hidden; }
+.boton-envio:active:not(:disabled) { transform: scale(0.97); }
+.boton-envio.cargando { cursor: progress; opacity: 1; }
+.boton-tx { position: relative; z-index: 1; }
+
+/* Barra que recorre el botón mientras envía: comunica avance, no
+   solo espera. Se dibuja debajo del texto, no encima. */
+.boton-barra {
+  position: absolute;
+  inset-block-end: 0;
+  inset-inline-start: 0;
+  block-size: 3px;
+  inline-size: 0;
+  background: var(--void);
+  opacity: 0.35;
+}
+.boton-envio.cargando .boton-barra {
+  animation: avance 1.6s cubic-bezier(0.3, 0, 0.2, 1) forwards;
+}
+@keyframes avance {
+  0%   { inline-size: 0; }
+  70%  { inline-size: 82%; }
+  100% { inline-size: 100%; }
+}
+
+/* Tres puntos que laten por turnos */
+.puntos { display: inline-flex; gap: 4px; z-index: 1; }
+.puntos i {
+  inline-size: 4px; block-size: 4px;
+  border-radius: 50%;
+  background: var(--void);
+  animation: latir 1.05s ease-in-out infinite;
+}
+.puntos i:nth-child(2) { animation-delay: 0.16s; }
+.puntos i:nth-child(3) { animation-delay: 0.32s; }
+@keyframes latir {
+  0%, 80%, 100% { opacity: 0.28; transform: translateY(0); }
+  40%           { opacity: 1;    transform: translateY(-3px); }
+}
+
+/* La confirmación entra desde abajo y el check se dibuja solo */
+.form-ok { animation: subir 0.55s var(--exp) both; }
+@keyframes subir {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.ok-check {
+  inline-size: 46px; block-size: 46px;
+  margin-block-end: 14px;
+  fill: none;
+  stroke: var(--hazard);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.ok-check circle {
+  stroke-dasharray: 145;
+  stroke-dashoffset: 145;
+  animation: trazar 0.65s var(--exp) 0.1s forwards;
+}
+.ok-check path {
+  stroke-dasharray: 40;
+  stroke-dashoffset: 40;
+  animation: trazar 0.4s var(--exp) 0.55s forwards;
+}
+@keyframes trazar { to { stroke-dashoffset: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .boton-envio.cargando .boton-barra { animation-duration: 0.01ms; inline-size: 100%; }
+  .puntos i { animation: none; opacity: 0.7; }
+  .form-ok { animation-duration: 0.01ms; }
+  .ok-check circle, .ok-check path { animation-duration: 0.01ms; stroke-dashoffset: 0; }
 }

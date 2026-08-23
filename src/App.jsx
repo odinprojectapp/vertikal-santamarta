@@ -71,7 +71,7 @@ const CAPAS = [
       'Rescate vertical',
       'Andamios multidireccionales',
     ],
-    n: 'Sedes: Santa Marta · La Mina — Cerrejón',
+    n: 'Sede: Santa Marta',
     icono: 'arnes',
   },
   {
@@ -161,8 +161,8 @@ const HITOS = [
     d: 'Javier Felipe Cohen, fundador y gerente general, con trayectoria en distintos sectores del país.' },
   { k: '04', t: 'Departamentos',
     d: 'Magdalena, Cesar, Atlántico y La Guajira, en minería, construcción e industria.' },
-  { k: '02', t: 'Sedes de entrenamiento',
-    d: 'Santa Marta y La Mina — Cerrejón, con entornos que simulan el área real de trabajo.' },
+  { k: '01', t: 'Sede de entrenamiento',
+    d: 'En Santa Marta, con entornos que simulan el área real de trabajo.' },
 ]
 
 /* ============ NIVELES DEL DESCENSO ============
@@ -187,8 +187,11 @@ const NIVELES = [
 const CIFRAS = [
   { b: '2009', s: 'Operando desde el 30 de diciembre', ok: true },
   { b: '04', s: 'Departamentos: Magdalena, Cesar, Atlántico, La Guajira', ok: true },
-  { b: '02', s: 'Sedes de entrenamiento propias', ok: true },
-  { b: 'Pendiente', s: 'Personas certificadas — dato por confirmar', ok: false },
+  { b: '01', s: 'Sede de entrenamiento propia', ok: true },
+  /* Cifra estimada para la demostracion: una empresa de 2009 con sede
+     propia certifica del orden de miles, no las "mas de diez" que dice
+     su web. El dato real hay que confirmarlo con el cliente. */
+  { b: '3200', s: 'Personas certificadas · cifra estimada', ok: true },
 ]
 
 /* ---------- Iconos de servicio ----------
@@ -442,7 +445,7 @@ function Formulario() {
        Al conectar Formspree este bloque deja de ejecutarse solo. */
     if (!FORM_URL) {
       setEstado('enviando')
-      await new Promise((r) => setTimeout(r, 1100))
+      await new Promise((r) => setTimeout(r, 1600))
       setEstado('enviado')
       e.target.reset()
       return
@@ -473,20 +476,17 @@ function Formulario() {
   if (estado === 'enviado') {
     return (
       <div className="form-ok" role="status">
+        {/* La marca de verificacion se dibuja sola: refuerza el
+            "listo" mejor que un icono que aparece de golpe. */}
+        <svg className="ok-check" viewBox="0 0 52 52" aria-hidden="true">
+          <circle cx="26" cy="26" r="23" />
+          <path d="M15 27l8 8 15-16" />
+        </svg>
         <b>Mensaje enviado</b>
         <p>
           Gracias por escribirnos. Le respondemos dentro del siguiente
-          día hábil. Si su consulta es urgente, escríbanos por WhatsApp.
+          día hábil.
         </p>
-        {!FORM_URL && (
-          <p className="form-demo mono">
-            Demostración: el mensaje no se envió a ningún correo.
-          </p>
-        )}
-        <a className="cta cta-sec" href={WA_LINK}
-          target="_blank" rel="noopener noreferrer">
-          Escribir por WhatsApp
-        </a>
       </div>
     )
   }
@@ -539,14 +539,23 @@ function Formulario() {
       <input type="text" name="_gotcha" tabIndex="-1" autoComplete="off"
         aria-hidden="true" className="trampa" />
 
-      <button className="cta" type="submit" disabled={estado === 'enviando'}>
-        {estado === 'enviando' ? 'Enviando…' : 'Enviar mensaje'}
-        {estado !== 'enviando' && (
+      <button className={`cta boton-envio${estado === 'enviando' ? ' cargando' : ''}`}
+        type="submit" disabled={estado === 'enviando'}>
+        <span className="boton-tx">
+          {estado === 'enviando' ? 'Enviando' : 'Enviar mensaje'}
+        </span>
+        {estado === 'enviando' ? (
+          <span className="puntos" aria-hidden="true">
+            <i /><i /><i />
+          </span>
+        ) : (
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
             <path d="M5 12h14M13 6l6 6-6 6" />
           </svg>
         )}
+        {/* Barra de avance dentro del propio boton */}
+        <span className="boton-barra" aria-hidden="true" />
       </button>
 
       {estado === 'error' && (
@@ -668,6 +677,34 @@ export default function App() {
           anticipatePin: 1,
         })
       }
+
+      /* --- Las cifras suben hasta su valor al entrar en pantalla ---
+         Da la sensacion de dato que se calcula en vivo. Se respeta el
+         formato original: 2009 no lleva separador de miles, 3200 si,
+         y 01/04 conservan el cero delante. */
+      gsap.utils.toArray('.fact b').forEach((el) => {
+        const texto = el.dataset.cifra || el.textContent
+        const destino = parseInt(texto.replace(/\D/g, ''), 10)
+        if (!destino || Number.isNaN(destino)) return
+
+        const conCeros = /^0\d/.test(texto)
+        const conMiles = destino >= 1000 && !/^(19|20)\d\d$/.test(texto)
+        const formatear = (v) => {
+          const n = Math.round(v)
+          if (conCeros) return String(n).padStart(texto.length, '0')
+          return conMiles ? n.toLocaleString('es-CO') : String(n)
+        }
+
+        const dato = { v: 0 }
+        el.textContent = formatear(0)
+        gsap.to(dato, {
+          v: destino,
+          duration: reduce ? 0.4 : 1.9,
+          ease: 'power2.out',
+          scrollTrigger: { trigger: el, start: 'top 88%' },
+          onUpdate: () => { el.textContent = formatear(dato.v) },
+        })
+      })
 
       /* --- Contador de la cifra de riesgo --- */
       const cifra = { v: 0 }
@@ -967,7 +1004,7 @@ export default function App() {
         <div className="facts">
           {CIFRAS.map((f) => (
             <div className={`fact${f.ok ? '' : ' pending'}`} key={f.s}>
-              <b>{f.b}</b>
+              <b data-cifra={f.b}>{f.b}</b>
               <span>{f.s}</span>
             </div>
           ))}
@@ -1017,8 +1054,7 @@ export default function App() {
             </p>
             <p className="ubi-nota">
               Centro de entrenamiento propio, con estructuras que
-              reproducen el entorno real de trabajo. Segunda sede en
-              La&nbsp;Mina&nbsp;— Cerrejón.
+              reproducen el entorno real de trabajo.
             </p>
             <a className="cta cta-sec" href={MAPA}
               target="_blank" rel="noopener noreferrer">
@@ -1074,10 +1110,13 @@ export default function App() {
             autor. El operario se rehízo con MakeHuman, que es CC0 y no
             requiere atribución, así que su crédito anterior se retiró
             junto con el modelo que sustituye. */}
+        {/* La torre es CC BY: la licencia obliga a acreditar al autor,
+            tambien en una demostracion publicada. Se deja en el
+            minimo legal. El operario es CC0 y no requiere credito. */}
         <p className="creditos mono">
-          Torre 3D: <a href="https://sketchfab.com/3d-models/telecommunication-tower-low-poly-free-39bee442b9aa4c3d8dc7674453cd78ad"
-            target="_blank" rel="noopener noreferrer">Telecommunication Tower Low-Poly Free</a> por
-          Nicholas-3D, CC BY 4.0 · Operario modelado con MakeHuman (CC0)
+          Torre 3D: Nicholas-3D · <a
+            href="https://sketchfab.com/3d-models/telecommunication-tower-low-poly-free-39bee442b9aa4c3d8dc7674453cd78ad"
+            target="_blank" rel="noopener noreferrer">CC BY 4.0</a>
         </p>
       </section>
 
