@@ -30,6 +30,22 @@ const WA_MSG = encodeURIComponent(
 )
 const WA_LINK = `https://wa.me/${WA}?text=${WA_MSG}`
 
+/* Formspree recibe el formulario y lo reenvia por correo. Es gratis
+   hasta 50 envios al mes y no necesita servidor propio.
+   Para activarlo: crear el formulario en formspree.io y pegar aqui su
+   ID. Mientras este vacio, el formulario avisa de que no esta
+   conectado en vez de fingir que envio algo. */
+const FORMSPREE_ID = ''
+const FORM_URL = FORMSPREE_ID ? `https://formspree.io/f/${FORMSPREE_ID}` : ''
+
+/* Direccion tomada de su ficha de Google Business, que es la que
+   alimenta el boton "Como llegar". Su web publica "Carrera 8B # 23-42";
+   la discrepancia esta anotada para confirmarla con el cliente. */
+const DIRECCION = 'Avenida del Ferrocarril, calle 23 esquina'
+const CIUDAD = 'Santa Marta, Magdalena'
+const MAPA = 'https://www.google.com/maps/search/?api=1&query=' +
+  encodeURIComponent('JFC VERTIKAL SAS, Avenida del Ferrocarril, Santa Marta, Magdalena')
+
 /* La altura desde la que la norma colombiana exige protección
    contra caídas. Es el umbral que dispara el estado del altímetro.
 
@@ -405,6 +421,131 @@ function Marquesina({ items }) {
         ))}
       </div>
     </div>
+  )
+}
+
+/* ============ FORMULARIO DE CONTACTO ============
+   Envia a Formspree, que reenvia por correo. Sin FORMSPREE_ID el
+   formulario avisa de que no esta conectado: es preferible decirlo
+   a que el usuario escriba y su mensaje se pierda. */
+function Formulario() {
+  const [estado, setEstado] = useState('listo')
+  const [error, setError] = useState('')
+
+  async function enviar(e) {
+    e.preventDefault()
+    if (!FORM_URL) {
+      setEstado('sin-conectar')
+      return
+    }
+    const datos = new FormData(e.target)
+    setEstado('enviando')
+    setError('')
+    try {
+      const r = await fetch(FORM_URL, {
+        method: 'POST',
+        body: datos,
+        headers: { Accept: 'application/json' },
+      })
+      if (r.ok) {
+        setEstado('enviado')
+        e.target.reset()
+      } else {
+        const d = await r.json().catch(() => ({}))
+        setError(d.errors?.[0]?.message || 'No se pudo enviar el mensaje.')
+        setEstado('error')
+      }
+    } catch {
+      setError('Sin conexión. Revise su red e intente de nuevo.')
+      setEstado('error')
+    }
+  }
+
+  if (estado === 'enviado') {
+    return (
+      <div className="form-ok" role="status">
+        <b>Mensaje enviado</b>
+        <p>
+          Gracias por escribirnos. Le respondemos dentro del siguiente
+          día hábil. Si su consulta es urgente, escríbanos por WhatsApp.
+        </p>
+        <a className="cta cta-sec" href={WA_LINK}
+          target="_blank" rel="noopener noreferrer">
+          Escribir por WhatsApp
+        </a>
+      </div>
+    )
+  }
+
+  return (
+    <form className="form" onSubmit={enviar} noValidate={false}>
+      <div className="campo">
+        <label htmlFor="f-nombre">Nombre</label>
+        <input id="f-nombre" name="nombre" type="text" required
+          autoComplete="name" placeholder="Su nombre" />
+      </div>
+
+      <div className="campo">
+        <label htmlFor="f-empresa">Empresa</label>
+        <input id="f-empresa" name="empresa" type="text"
+          autoComplete="organization" placeholder="Opcional" />
+      </div>
+
+      <div className="campo-fila">
+        <div className="campo">
+          <label htmlFor="f-tel">Teléfono</label>
+          <input id="f-tel" name="telefono" type="tel" required
+            autoComplete="tel" inputMode="tel" placeholder="300 000 0000" />
+        </div>
+        <div className="campo">
+          <label htmlFor="f-mail">Correo</label>
+          <input id="f-mail" name="correo" type="email"
+            autoComplete="email" placeholder="Opcional" />
+        </div>
+      </div>
+
+      <div className="campo">
+        <label htmlFor="f-servicio">Qué necesita</label>
+        <select id="f-servicio" name="servicio" defaultValue="">
+          <option value="" disabled>Seleccione un servicio</option>
+          {CAPAS.map((c) => (
+            <option key={c.ix} value={c.t}>{c.t}</option>
+          ))}
+          <option value="Otro">Otro / no estoy seguro</option>
+        </select>
+      </div>
+
+      <div className="campo">
+        <label htmlFor="f-msg">Mensaje</label>
+        <textarea id="f-msg" name="mensaje" rows="4" required
+          placeholder="Cuéntenos brevemente qué necesita: número de personas a certificar, tipo de estructura, plazos…" />
+      </div>
+
+      {/* Campo trampa: los robots lo rellenan, las personas no lo ven */}
+      <input type="text" name="_gotcha" tabIndex="-1" autoComplete="off"
+        aria-hidden="true" className="trampa" />
+
+      <button className="cta" type="submit" disabled={estado === 'enviando'}>
+        {estado === 'enviando' ? 'Enviando…' : 'Enviar mensaje'}
+        {estado !== 'enviando' && (
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
+            <path d="M5 12h14M13 6l6 6-6 6" />
+          </svg>
+        )}
+      </button>
+
+      {estado === 'error' && (
+        <p className="form-error" role="alert">{error}</p>
+      )}
+      {estado === 'sin-conectar' && (
+        <p className="form-error" role="alert">
+          El formulario aún no está conectado en esta demostración.
+          Escríbanos por <a href={WA_LINK} target="_blank"
+            rel="noopener noreferrer">WhatsApp</a> y le respondemos igual.
+        </p>
+      )}
+    </form>
   )
 }
 
@@ -829,9 +970,48 @@ export default function App() {
               <span className="k">Correo</span>{MAIL}
             </a>
             <div>
-              <span className="k">Dirección</span>Carrera 8B # 23-42 · Santa Marta
+              <span className="k">Dirección</span>{DIRECCION} · {CIUDAD}
+            </div>
+            <div>
+              <span className="k">Horario</span>Lunes a viernes, 7:00 a.m. – 5:00 p.m.
             </div>
           </div>
+
+          {/* ---------- CÓMO ENCONTRARNOS ---------- */}
+          <div className="ubicacion reveal">
+            <span className="eyebrow">Cómo encontrarnos</span>
+            <h3>Sede Santa Marta</h3>
+            <p className="ubi-dir">
+              {DIRECCION}<br />{CIUDAD}
+            </p>
+            <p className="ubi-nota">
+              Centro de entrenamiento propio, con estructuras que
+              reproducen el entorno real de trabajo. Segunda sede en
+              La&nbsp;Mina&nbsp;— Cerrejón.
+            </p>
+            <a className="cta cta-sec" href={MAPA}
+              target="_blank" rel="noopener noreferrer">
+              Cómo llegar
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" strokeWidth="2.2" aria-hidden="true">
+                <path d="M12 21s7-6.4 7-11a7 7 0 1 0-14 0c0 4.6 7 11 7 11z" />
+                <circle cx="12" cy="10" r="2.6" />
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        {/* ---------- FORMULARIO ---------- */}
+        <div className="form-bloque reveal">
+          <div className="form-intro">
+            <span className="eyebrow">Escríbanos</span>
+            <h3>Cuéntenos qué necesita</h3>
+            <p>
+              Respondemos dentro del siguiente día hábil. Si prefiere
+              hablarlo por teléfono, déjenos su número y lo llamamos.
+            </p>
+          </div>
+          <Formulario />
         </div>
 
         <div className="redes">
