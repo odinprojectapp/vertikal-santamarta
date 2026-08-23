@@ -249,7 +249,12 @@ img, svg { display: block; max-width: 100%; }
 /* ============ HERO ============ */
 .tower {
   height: 100vh; height: 100svh;
-  overflow: hidden;
+  /* clip, no hidden: hidden convierte al hero en contenedor de
+     scroll, y como es la primera seccion de la pagina, en movil
+     atrapa el gesto justo en el arranque. Ese era el motivo de tener
+     que forzar el primer deslizamiento. */
+  overflow: clip;
+  touch-action: pan-y;
   /* Degradado inferior: asienta el titular sobre la torre sin
      taparla. Sin esto el texto compite con la estructura. */
   background: linear-gradient(180deg,
@@ -896,7 +901,7 @@ img, svg { display: block; max-width: 100%; }
 }
 
 /* ============ REFERENTES ============ */
-.refs { overflow: hidden; }
+.refs { overflow: clip; touch-action: pan-y; }
 
 .marquee {
   margin-block-start: clamp(38px, 6vh, 64px);

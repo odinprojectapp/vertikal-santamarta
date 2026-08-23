@@ -580,21 +580,24 @@ export default function App() {
        no se instancia: el scroll nativo es el comportamiento correcto. */
     let limpiarLenis = null
     if (!reduce) {
-      /* syncTouch en false: en móvil Lenis intercepta el gesto táctil
-         y compite con el scroll nativo del sistema, que es lo que hace
-         que se sienta pegado. El scroll suave se queda en escritorio,
-         donde sí aporta; en móvil el nativo ya es fluido. */
-      const lenis = new Lenis({
-        duration: 1.15,
-        smoothWheel: true,
-        syncTouch: false,
-        touchMultiplier: 1.6,
-      })
-      const tick = (t) => lenis.raf(t * 1000)
-      gsap.ticker.add(tick)
-      gsap.ticker.lagSmoothing(0)
-      lenis.on('scroll', ScrollTrigger.update)
-      limpiarLenis = () => { gsap.ticker.remove(tick); lenis.destroy() }
+      /* Lenis NO se instancia en móvil.
+
+         syncTouch:false no bastaba: Lenis instala sus escuchas
+         táctiles igualmente, y en iOS eso basta para que el primer
+         deslizamiento no arranque y haya que forzar el gesto.
+         El scroll nativo del móvil ya es fluido; el suavizado se
+         queda donde sí aporta, que es la rueda del ratón. */
+      const tactil = window.matchMedia('(pointer: coarse)').matches ||
+        window.matchMedia('(max-width: 900px)').matches
+
+      if (!tactil) {
+        const lenis = new Lenis({ duration: 1.15, smoothWheel: true })
+        const tick = (t) => lenis.raf(t * 1000)
+        gsap.ticker.add(tick)
+        gsap.ticker.lagSmoothing(0)
+        lenis.on('scroll', ScrollTrigger.update)
+        limpiarLenis = () => { gsap.ticker.remove(tick); lenis.destroy() }
+      }
     }
 
     const ctx = gsap.context(() => {
