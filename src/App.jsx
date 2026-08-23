@@ -731,8 +731,15 @@ export default function App() {
           {NIVELES.map((n) => (
             <li className="nivel reveal" key={n.k}>
               <div className="nivel-foto">
-                {/* Marcador: sustituir por la foto real cuando el
-                    cliente autorice el uso de su galería. */}
+                {/* Si el archivo existe se muestra; si no, queda el
+                    marcador. Basta con dejar la imagen en
+                    public/galeria/<clave>.webp para activarla. */}
+                <img
+                  src={`${import.meta.env.BASE_URL}galeria/${n.k}.webp`}
+                  alt={n.t}
+                  loading="lazy"
+                  onError={(e) => { e.currentTarget.style.display = 'none' }}
+                />
                 <span className="nivel-pend mono">
                   Foto pendiente<br /><b>{n.k}</b>
                 </span>

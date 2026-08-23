@@ -797,12 +797,28 @@ img, svg { display: block; max-width: 100%; }
   flex-direction: column;
 }
 .nivel-foto {
+  position: relative;
   aspect-ratio: 4 / 3;
   display: grid;
   place-items: center;
+  overflow: hidden;
   background: repeating-linear-gradient(45deg,
     rgba(255,242,0,0.03) 0 10px, transparent 10px 20px);
   border-block-end: 1px solid var(--grid);
+}
+/* La foto tapa el marcador cuando existe. */
+.nivel-foto img {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  z-index: 1;
+  filter: grayscale(0.25) contrast(1.06);
+  transition: filter 0.5s var(--exp), transform 0.6s var(--exp);
+}
+@media (hover: hover) and (pointer: fine) {
+  .nivel:hover .nivel-foto img { filter: none; transform: scale(1.04); }
 }
 .nivel-pend {
   font-size: var(--t-xs);
