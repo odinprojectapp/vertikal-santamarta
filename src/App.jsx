@@ -434,8 +434,17 @@ function Formulario() {
 
   async function enviar(e) {
     e.preventDefault()
+
+    /* MODO DEMOSTRACIÓN: sin FORMSPREE_ID no hay a dónde enviar, así
+       que se simula el envío para que el recorrido completo se pueda
+       mostrar en la reunión. La espera es real (no instantánea) para
+       que el estado "Enviando…" se lea como en un envío de verdad.
+       Al conectar Formspree este bloque deja de ejecutarse solo. */
     if (!FORM_URL) {
-      setEstado('sin-conectar')
+      setEstado('enviando')
+      await new Promise((r) => setTimeout(r, 1100))
+      setEstado('enviado')
+      e.target.reset()
       return
     }
     const datos = new FormData(e.target)
@@ -469,6 +478,11 @@ function Formulario() {
           Gracias por escribirnos. Le respondemos dentro del siguiente
           día hábil. Si su consulta es urgente, escríbanos por WhatsApp.
         </p>
+        {!FORM_URL && (
+          <p className="form-demo mono">
+            Demostración: el mensaje no se envió a ningún correo.
+          </p>
+        )}
         <a className="cta cta-sec" href={WA_LINK}
           target="_blank" rel="noopener noreferrer">
           Escribir por WhatsApp
@@ -538,13 +552,6 @@ function Formulario() {
       {estado === 'error' && (
         <p className="form-error" role="alert">{error}</p>
       )}
-      {estado === 'sin-conectar' && (
-        <p className="form-error" role="alert">
-          El formulario aún no está conectado en esta demostración.
-          Escríbanos por <a href={WA_LINK} target="_blank"
-            rel="noopener noreferrer">WhatsApp</a> y le respondemos igual.
-        </p>
-      )}
     </form>
   )
 }
@@ -573,7 +580,16 @@ export default function App() {
        no se instancia: el scroll nativo es el comportamiento correcto. */
     let limpiarLenis = null
     if (!reduce) {
-      const lenis = new Lenis({ duration: 1.15, smoothWheel: true })
+      /* syncTouch en false: en móvil Lenis intercepta el gesto táctil
+         y compite con el scroll nativo del sistema, que es lo que hace
+         que se sienta pegado. El scroll suave se queda en escritorio,
+         donde sí aporta; en móvil el nativo ya es fluido. */
+      const lenis = new Lenis({
+        duration: 1.15,
+        smoothWheel: true,
+        syncTouch: false,
+        touchMultiplier: 1.6,
+      })
       const tick = (t) => lenis.raf(t * 1000)
       gsap.ticker.add(tick)
       gsap.ticker.lagSmoothing(0)

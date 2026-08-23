@@ -70,20 +70,47 @@ export default function Descenso({ progreso }) {
     return () => cancelAnimationFrame(raf)
   }, [progreso])
 
-  /* El lienzo se dimensiona al viewport, con tope de 2x para no
-     rasterizar de más en pantallas de alta densidad. */
+  /* El lienzo se dimensiona al viewport.
+
+     En móvil se limita la densidad a 1: rasterizar a 2x en una
+     pantalla de 412x915 son 824x1830 píxeles que hay que volver a
+     pintar en cada fotograma, y ahí es donde el scroll se traba.
+     Como las imágenes de origen son de 1280x720, subir de 1x no
+     añade detalle real: solo cuesta.
+
+     El resize se ignora si solo cambió la altura, porque en móvil
+     eso pasa cada vez que el navegador oculta o muestra su barra
+     de direcciones — no es un cambio real de tamaño. */
   useEffect(() => {
+    let anchoPrevio = 0
+    let temporizador
+
     const medir = () => {
       const c = lienzo.current
       if (!c) return
-      const d = Math.min(window.devicePixelRatio || 1, 2)
+      const movil = window.innerWidth < 900
+      const d = movil ? 1 : Math.min(window.devicePixelRatio || 1, 2)
       c.width = Math.round(window.innerWidth * d)
       c.height = Math.round(window.innerHeight * d)
+      anchoPrevio = window.innerWidth
       actual.current = -1
     }
+
+    const alRedimensionar = () => {
+      /* solo importa el cambio de ancho: la altura oscila sola */
+      if (window.innerWidth === anchoPrevio) return
+      clearTimeout(temporizador)
+      temporizador = setTimeout(medir, 150)
+    }
+
     medir()
-    window.addEventListener('resize', medir)
-    return () => window.removeEventListener('resize', medir)
+    window.addEventListener('resize', alRedimensionar)
+    window.addEventListener('orientationchange', medir)
+    return () => {
+      clearTimeout(temporizador)
+      window.removeEventListener('resize', alRedimensionar)
+      window.removeEventListener('orientationchange', medir)
+    }
   }, [])
 
   return (

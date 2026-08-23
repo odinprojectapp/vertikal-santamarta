@@ -1275,3 +1275,15 @@ img, svg { display: block; max-width: 100%; }
   color: var(--bone-2);
   max-width: 44ch;
 }
+
+/* Aviso de que el envío es simulado. Va dentro de la confirmación,
+   en tono discreto: el recorrido se ve completo, pero sin afirmar
+   que llegó un correo que nadie envió. */
+.form-demo {
+  margin-block-start: 14px;
+  padding-block-start: 12px;
+  border-block-start: 1px solid var(--grid-2);
+  font-size: var(--t-xs);
+  letter-spacing: 0.1em;
+  color: var(--bone-3);
+}
