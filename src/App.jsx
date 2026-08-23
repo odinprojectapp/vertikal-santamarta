@@ -121,33 +121,6 @@ const CAPAS = [
    Los siete logos salen de la biblioteca de medios del propio
    sitio de Vertikal (wp-content/uploads/2018/07). No se
    añadió ninguna marca que ellos no publiquen. */
-/* ============ EQUIPOS ============
-   Vertikal tambien comercializa equipo de proteccion contra caidas.
-   No esta en su web actual, asi que este catalogo es una propuesta:
-   muestra las familias de producto sin precios ni carrito, porque
-   todavia no sabemos si vende por cotizacion o a precio fijo.
-   El boton lleva a WhatsApp con el producto ya escrito. */
-const EQUIPOS = [
-  { k: 'arnes', t: 'Arneses de cuerpo entero',
-    d: 'Con argolla dorsal y puntos de anclaje laterales, para posicionamiento y detención de caídas.',
-    n: 'Certificados bajo norma' },
-  { k: 'eslinga', t: 'Eslingas y absorbedores',
-    d: 'Eslingas en Y con absorbedor de energía, de longitud fija o regulable.',
-    n: 'Con mosquetón de seguridad' },
-  { k: 'linea', t: 'Líneas de vida',
-    d: 'Verticales y horizontales, con memorias de cálculo estructural y certificación de instalación.',
-    n: 'Diseño, suministro e instalación' },
-  { k: 'casco', t: 'Protección personal',
-    d: 'Cascos con barbuquejo de tres puntos, gafas de seguridad y guantes para trabajo en altura.',
-    n: 'Dotación completa' },
-  { k: 'anclaje', t: 'Puntos de anclaje',
-    d: 'Fijos y móviles, para estructura metálica, concreto y cubierta.',
-    n: 'Con certificación de carga' },
-  { k: 'rescate', t: 'Equipos de rescate',
-    d: 'Trípodes, camillas de rescate vertical, poleas y sistemas de izaje.',
-    n: 'Para brigadas de emergencia' },
-]
-
 const REFERENTES = [
   { n: 'Cerrejón',              f: 'cerrejon.png',    d: 'Minería responsable' },
   { n: 'Drummond Ltd.',         f: 'drummond.png',    d: 'Colombia' },
@@ -292,80 +265,6 @@ function Icono({ tipo }) {
 }
 
 /* ---------- Iconos de red ---------- */
-/* Iconos del catalogo de equipos. Mismo trazo y rejilla de 48px que
-   los de servicio, para que la pagina no mezcle dos estilos. */
-function IconoEquipo({ tipo }) {
-  const A = { fill: 'none', stroke: 'currentColor', strokeWidth: 1.6,
-    strokeLinecap: 'round', strokeLinejoin: 'round' }
-  const B = { ...A, strokeWidth: 1.1, opacity: 0.5 }
-
-  const svg = {
-    /* ARNES: correas de pecho y perneras con argolla dorsal */
-    arnes: <>
-      <path d="M18 9.5v6.5M30 9.5v6.5" {...A} />
-      <path d="M18 16l6 5 6-5" {...A} />
-      <path d="M24 21v7" {...A} />
-      <path d="M24 28l-5.5 4.5V40M24 28l5.5 4.5V40" {...A} />
-      <circle cx="24" cy="18.5" r="2.4" {...A} />
-      <path d="M16.5 24h15" {...B} />
-      <path d="M17 40h4M27 40h4" {...B} />
-    </>,
-    /* ESLINGA: cinta con absorbedor y mosqueton */
-    eslinga: <>
-      <path d="M24 8v7" {...A} />
-      <rect x="20" y="15" width="8" height="11" rx="1.6" {...A} />
-      <path d="M21.6 18h4.8M21.6 21h4.8M21.6 23.5h4.8" {...B} />
-      <path d="M24 26v5l-5 4M24 31l5 4" {...A} />
-      <path d="M17.5 35.5a2.6 2.6 0 1 0 3 4M30.5 35.5a2.6 2.6 0 1 1-3 4" {...A} />
-    </>,
-    /* LINEA DE VIDA: cable vertical con anclajes */
-    linea: <>
-      <path d="M24 7v34" {...A} />
-      <path d="M17 9h14M17 39h14" {...A} />
-      <circle cx="24" cy="16" r="2.2" {...A} />
-      <circle cx="24" cy="24" r="2.2" {...A} />
-      <circle cx="24" cy="32" r="2.2" {...A} />
-      <path d="M19.5 12.5h9M19.5 35.5h9" {...B} />
-    </>,
-    /* PROTECCION: gafas de seguridad. El casco ya identifica al
-       servicio de Formacion, asi que repetirlo aqui confundiria las
-       dos secciones. Las gafas son la pieza de dotacion mas
-       reconocible despues del casco. */
-    casco: <>
-      <path d="M9 20h30v3.5a5 5 0 0 1-5 5h-4.6a4 4 0 0 1-3.7-2.5L24 23l-1.7 3a4 4 0 0 1-3.7 2.5H14a5 5 0 0 1-5-5V20z" {...A} />
-      <path d="M9 20l3-4h24l3 4" {...A} />
-      <path d="M6 18.5l3 1.5M42 18.5l-3 1.5" {...B} />
-      <path d="M14.5 23.5h3.5M30 23.5h3.5" {...B} />
-      <path d="M18 32.5h12" {...B} />
-    </>,
-    /* ANCLAJE: placa con perno y argolla */
-    anclaje: <>
-      <rect x="13" y="28" width="22" height="7" rx="1.2" {...A} />
-      <path d="M16.5 35v4M31.5 35v4" {...B} />
-      <path d="M24 28v-6" {...A} />
-      <circle cx="24" cy="17" r="5" {...A} />
-      <circle cx="24" cy="17" r="2.2" {...B} />
-      <path d="M17 31.5h3M28 31.5h3" {...B} />
-    </>,
-    /* RESCATE: tripode con polea */
-    rescate: <>
-      <path d="M24 10L13 40M24 10l11 30M24 10v4" {...A} />
-      <circle cx="24" cy="9" r="2.2" {...A} />
-      <path d="M17.5 26h13" {...B} />
-      <path d="M24 14v13" {...A} />
-      <circle cx="24" cy="29.5" r="2.6" {...A} />
-      <path d="M24 32v6" {...A} />
-      <path d="M21 38h6" {...B} />
-    </>,
-  }
-
-  return (
-    <svg viewBox="0 0 48 48" width="40" height="40" aria-hidden="true">
-      {svg[tipo] || null}
-    </svg>
-  )
-}
-
 function IconoRed({ id }) {
   return (
     <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"
@@ -886,47 +785,6 @@ export default function App() {
         </div>
 
         <Servicios items={CAPAS} />
-      </section>
-
-      {/* ---------- EQUIPOS ---------- */}
-      <section className="chapter wrap equipos" id="equipos">
-        <div className="chapter-head reveal">
-          <span className="eyebrow">Equipos</span>
-          <h2>También suministramos<br />lo que enseñamos a usar</h2>
-          <p>
-            Equipo de protección contra caídas para dotación de
-            personal y para proyectos de ingeniería.
-          </p>
-        </div>
-
-        <ul className="eq-lista">
-          {EQUIPOS.map((e) => (
-            <li className="eq reveal" key={e.k}>
-              <span className="eq-ic" aria-hidden="true">
-                <IconoEquipo tipo={e.k} />
-              </span>
-              <h3>{e.t}</h3>
-              <p>{e.d}</p>
-              <span className="eq-n mono">{e.n}</span>
-              <a className="eq-cta"
-                href={`https://wa.me/${WA}?text=${encodeURIComponent(
-                  `Hola, los contacto desde su página web. Me interesa cotizar: ${e.t}.`
-                )}`}
-                target="_blank" rel="noopener noreferrer">
-                Solicitar cotización
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
-                  <path d="M5 12h14M13 6l6 6-6 6" />
-                </svg>
-              </a>
-            </li>
-          ))}
-        </ul>
-
-        <p className="eq-pie mono reveal">
-          Marcas y referencias según requerimiento del proyecto.
-          Cotización sin costo.
-        </p>
       </section>
 
       {/* ---------- VALORES ---------- */}
