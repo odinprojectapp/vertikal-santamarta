@@ -464,11 +464,14 @@ export default function App() {
         yPercent: 108, opacity: 0,
         duration: 1.05, delay: 0.62, ease: 'power4.out',
       })
-      gsap.fromTo('.remate b',
-        { filter: 'blur(3px)' },
-        { filter: 'blur(0px)', ease: 'none',
+      /* Sin desenfoque: dejaba el eslogan ilegible. El scroll ahora
+         solo abre el interletrado de VERTIKAL, que refuerza la
+         marca sin estorbar la lectura. */
+      gsap.fromTo('.marca-vk',
+        { letterSpacing: '0.02em' },
+        { letterSpacing: '0.09em', ease: 'none',
           scrollTrigger: {
-            trigger: '.tower', start: 'top top', end: '22% top', scrub: 0.5,
+            trigger: '.tower', start: 'top top', end: '26% top', scrub: 0.6,
           } })
 
       /* --- Entrada del hero: revelado por línea --- */
@@ -588,7 +591,9 @@ export default function App() {
             <span className="line-mask"><span>Cuando</span></span>
             <span className="line-mask"><span>el trabajo</span></span>
             <span className="line-mask"><em>es un reto</em></span>
-            <span className="line-mask remate"><b>piense Vertikal</b></span>
+            <span className="line-mask remate">
+              <b>piense <span className="marca-vk">VERTIKAL</span></b>
+            </span>
           </h1>
           <p className="tower-sub">
             Formación, ingeniería y supervisión en trabajo seguro en alturas

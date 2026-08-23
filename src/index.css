@@ -5,7 +5,7 @@
    es el color de su logo y el del arnés de seguridad.
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Michroma&display=swap');
 
 :root {
   /* --- Color. Neutros con sesgo frío de acero, no grises puros --- */
@@ -270,6 +270,19 @@ img, svg { display: block; max-width: 100%; }
   display: block;
   font-weight: 400;
   color: var(--bone);
+}
+/* VERTIKAL con la tipografía del logo: geométrica ancha de
+   terminaciones redondeadas, no la condensada del titular. */
+.marca-vk {
+  font-family: 'Michroma', 'Barlow Condensed', sans-serif;
+  /* Michroma solo tiene un peso y su trazo es fino: junto a la
+     Bebas del titular quedaba desequilibrado. El contorno lo
+     engrosa ópticamente sin deformar la letra. */
+  font-size: 0.58em;
+  letter-spacing: 0.02em;
+  vertical-align: 0.05em;
+  -webkit-text-stroke: 1.1px var(--bone);
+  paint-order: stroke fill;
 }
 .tower-sub {
   margin-block-start: 20px;
