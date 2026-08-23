@@ -31,8 +31,13 @@ const WA_MSG = encodeURIComponent(
 const WA_LINK = `https://wa.me/${WA}?text=${WA_MSG}`
 
 /* La altura desde la que la norma colombiana exige protección
-   contra caídas. Es el umbral que dispara el estado del altímetro. */
-const UMBRAL_M = 1.8
+   contra caídas. Es el umbral que dispara el estado del altímetro.
+
+   Resolución 4272 de 2021 del Ministerio del Trabajo, artículo 3:
+   trabajo en alturas es toda actividad con riesgo de caída a
+   2,00 m o más respecto del plano horizontal inferior más cercano.
+   Derogó la Resolución 1409 de 2012, que fijaba el umbral en 1,50 m. */
+const UMBRAL_M = 2.0
 const ALTURA_MAX = 42
 
 /* ============ SERVICIOS ============
@@ -135,7 +140,7 @@ const VALORES = [
    Todo verificado en vertikalsas.com/index.php/conocenos/ */
 const HITOS = [
   { k: '2009', t: 'Fundación',
-    d: 'El 30 de diciembre, como respuesta a la Resolución 3673 de 2008 sobre trabajo seguro en alturas.' },
+    d: 'El 30 de diciembre, como respuesta a la Resolución 3673 de 2008, primera norma nacional de trabajo en alturas.' },
   { k: '21+', t: 'Años del gerente en alturas',
     d: 'Javier Felipe Cohen, fundador y gerente general, con trayectoria en distintos sectores del país.' },
   { k: '04', t: 'Departamentos',
@@ -495,7 +500,7 @@ export default function App() {
       /* --- Contador de la cifra de riesgo --- */
       const cifra = { v: 0 }
       gsap.to(cifra, {
-        v: 1.8, duration: 1.6, ease: 'power2.out',
+        v: UMBRAL_M, duration: 1.6, ease: 'power2.out',
         scrollTrigger: { trigger: '.risk', start: 'top 60%' },
         onUpdate: () => {
           const el = document.querySelector('.risk-num')
@@ -618,7 +623,8 @@ export default function App() {
               protección contra caídas.
             </p>
             <p className="risk-note">
-              No es una recomendación. Es la norma.
+              No es una recomendación. Es la Resolución 4272 de 2021
+              del Ministerio del Trabajo.
             </p>
           </div>
         </div>

@@ -129,8 +129,9 @@ img, svg { display: block; max-width: 100%; }
 
 /* ============ ALTÍMETRO — el diferenciador ============
    No es decoración: marca la altura del descenso y cambia de
-   estado al cruzar 1,80 m, que es donde la norma colombiana
-   empieza a exigir protección contra caídas. */
+   estado al cruzar 2,00 m, que es donde la norma colombiana
+   empieza a exigir protección contra caídas (Resolución 4272
+   de 2021, que derogó la 1409 de 2012). */
 .altimeter {
   position: fixed;
   inset-inline-end: clamp(12px, 2vw, 28px);
