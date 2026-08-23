@@ -264,6 +264,13 @@ img, svg { display: block; max-width: 100%; }
   color: var(--hazard);
   display: block;
 }
+/* El remate va en blanco sobre el amarillo del reto: contraste de
+   color que separa la pregunta de la respuesta. */
+.tower-title .remate b {
+  display: block;
+  font-weight: 400;
+  color: var(--bone);
+}
 .tower-sub {
   margin-block-start: 20px;
   color: var(--bone-2);

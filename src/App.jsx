@@ -453,6 +453,16 @@ export default function App() {
         },
       })
 
+      /* --- El remate del eslogan entra al empezar a descender ---
+             Primero se lee el reto; la respuesta llega cuando el
+             visitante ya está bajando. */
+      gsap.fromTo('.remate b',
+        { yPercent: 105, opacity: 0 },
+        { yPercent: 0, opacity: 1, ease: 'none',
+          scrollTrigger: {
+            trigger: '.tower', start: 'top top', end: '28% top', scrub: 0.6,
+          } })
+
       /* --- Entrada del hero: revelado por línea --- */
       gsap.from('.line-mask > span', {
         yPercent: 115, duration: 1.05, stagger: 0.09,
@@ -563,10 +573,14 @@ export default function App() {
             alt="VERTIKAL — Trabajo seguro en alturas"
             width="300" height="58" />
           <span className="eyebrow">Vertikal · Santa Marta</span>
+          {/* El eslogan completo del cliente. La segunda mitad
+              entra al empezar a descender: primero se plantea el
+              reto, y al bajar aparece la respuesta. */}
           <h1 className="tower-title">
             <span className="line-mask"><span>Cuando</span></span>
             <span className="line-mask"><span>el trabajo</span></span>
             <span className="line-mask"><em>es un reto</em></span>
+            <span className="line-mask remate"><b>piense Vertikal</b></span>
           </h1>
           <p className="tower-sub">
             Formación, ingeniería y supervisión en trabajo seguro en alturas
