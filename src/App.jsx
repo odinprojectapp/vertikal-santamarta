@@ -131,6 +131,19 @@ const VALORES = [
   { ix: '06', t: 'Respeto',           d: 'Entendemos tus necesidades, las apropiamos como nuestras.' },
 ]
 
+/* ============ CONÓCENOS ============
+   Todo verificado en vertikalsas.com/index.php/conocenos/ */
+const HITOS = [
+  { k: '2009', t: 'Fundación',
+    d: 'El 30 de diciembre, como respuesta a la Resolución 3673 de 2008 sobre trabajo seguro en alturas.' },
+  { k: '21+', t: 'Años del gerente en alturas',
+    d: 'Javier Felipe Cohen, fundador y gerente general, con trayectoria en distintos sectores del país.' },
+  { k: '04', t: 'Departamentos',
+    d: 'Magdalena, Cesar, Atlántico y La Guajira, en minería, construcción e industria.' },
+  { k: '02', t: 'Sedes de entrenamiento',
+    d: 'Santa Marta y La Mina — Cerrejón, con entornos que simulan el área real de trabajo.' },
+]
+
 /* ============ NIVELES DEL DESCENSO ============
    Seis actividades reales, cada una a su altura. Las fotos son de
    su galería de Google: quedan como marcador hasta que el cliente
@@ -659,6 +672,36 @@ export default function App() {
         </div>
       </section>
 
+      {/* ---------- CONÓCENOS ---------- */}
+      <section className="chapter wrap conocenos" id="conocenos">
+        <div className="cgrid">
+          <div className="reveal">
+            <span className="eyebrow">Conócenos</span>
+            <h2 className="vtitulo">Diecisiete años<br />sobre estructuras</h2>
+            <p className="vtexto">
+              Vertikal nace en 2009 como respuesta a la necesidad de
+              capacitación y certificación en trabajo seguro en alturas.
+              Hoy opera en cuatro departamentos del Caribe colombiano.
+            </p>
+            <p className="cmision">
+              <b>Misión.</b> Empresa especializada en tareas de alto riesgo.
+              Brindamos soluciones técnicas y de vanguardia, interventoría,
+              asesoría y formación especializada.
+            </p>
+          </div>
+
+          <ol className="hitos reveal">
+            {HITOS.map((h) => (
+              <li key={h.k}>
+                <b className="mono">{h.k}</b>
+                <span className="hito-t">{h.t}</span>
+                <span className="hito-d">{h.d}</span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
       {/* ---------- NIVELES ---------- */}
       <section className="chapter wrap niveles" id="niveles">
         <div className="chapter-head reveal">
@@ -776,6 +819,17 @@ export default function App() {
           </span>
           <span>Demostración — no es el sitio oficial</span>
         </footer>
+
+        {/* Créditos obligatorios: ambos modelos son CC Attribution,
+            que exige acreditar al autor. Sin esto se incumple la
+            licencia. */}
+        <p className="creditos mono">
+          Modelos 3D bajo licencia CC BY 4.0 ·
+          Torre: <a href="https://sketchfab.com/3d-models/telecommunication-tower-low-poly-free-39bee442b9aa4c3d8dc7674453cd78ad"
+            target="_blank" rel="noopener noreferrer">Telecommunication Tower Low-Poly Free</a> por Nicholas-3D ·
+          Figura: <a href="https://sketchfab.com/3d-models/lowpoly-human-rigged-99217f23d0b74600b882795c41c13ca0"
+            target="_blank" rel="noopener noreferrer">Lowpoly Human (Rigged)</a> por void
+        </p>
       </section>
 
       <div className="demo-tag">Demo · Vertikal</div>
