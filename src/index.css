@@ -68,7 +68,15 @@ body {
   font-size: var(--t-body);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
+  /* clip en vez de hidden: hidden convierte al body en contenedor de
+     scroll y en movil eso atrapa el gesto tactil, obligando a
+     "despertar" el scroll deslizando hacia arriba. clip recorta
+     igual sin crear ese contexto. */
+  overflow-x: clip;
+  /* El gesto vertical siempre pertenece al navegador. Sin esto, un
+     elemento fijo puede quedarse el toque y bloquear el scroll. */
+  touch-action: pan-y;
+  overscroll-behavior-y: none;
 }
 
 h1, h2, h3 { margin: 0; font-weight: 400; }
@@ -190,6 +198,12 @@ img, svg { display: block; max-width: 100%; }
   pointer-events: none;
 }
 .escena canvas { display: block; }
+
+/* Ningun elemento fijo debe interceptar el gesto vertical: el scroll
+   es del navegador. Se marca explicitamente porque en iOS un
+   position:fixed a pantalla completa puede quedarselo. */
+.escena, .escena::after, .descenso,
+.altimeter, .progress, .demo-tag { touch-action: none; }
 .descenso {
   inline-size: 100%;
   block-size: 100%;
@@ -345,6 +359,10 @@ img, svg { display: block; max-width: 100%; }
 @media (max-width: 900px) {
   .risk { background: rgba(10,12,14,0.9); }
 }
+/* El panel fijado cubre el viewport completo mientras esta pinneado.
+   Sin touch-action el dedo aterriza sobre el y el scroll no arranca:
+   es la causa de tener que forzar hacia arriba para activarlo. */
+.risk-pin { touch-action: pan-y; }
 .risk-pin {
   height: 100vh; height: 100svh;
   display: grid;
@@ -356,7 +374,17 @@ img, svg { display: block; max-width: 100%; }
      al técnico descender detrás. */
   max-width: 54%;
 }
-@media (max-width: 900px) { .risk-pin { max-width: 100%; } }
+@media (max-width: 900px) {
+  .risk-pin {
+    max-width: 100%;
+    /* Sin pin en movil el panel no necesita llenar la pantalla:
+       ocupando el viewport completo obliga a un scroll extra para
+       pasarlo. */
+    height: auto;
+    min-height: 62svh;
+    padding-block: 12vh;
+  }
+}
 .risk-num {
   font-family: var(--display);
   font-size: clamp(5rem, 3rem + 14vw, 16rem);

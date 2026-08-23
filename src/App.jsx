@@ -647,10 +647,22 @@ export default function App() {
         { opacity: 0 },
         { opacity: 1, duration: 0.9, delay: 0.75, ease: 'power2.out' })
 
-      if (!reduce) {
-        /* --- El panel del riesgo se queda fijo mientras cuenta --- */
+      /* --- El panel del riesgo se queda fijo mientras cuenta ---
+         Solo en escritorio. El pin reestructura el DOM insertando un
+         contenedor, y en movil eso rompe el hilo del scroll tactil:
+         el dedo aterriza sobre el panel fijado y hay que forzar hacia
+         arriba para que el scroll arranque.
+         En movil la seccion pasa sin pin y el efecto se sostiene con
+         el propio ritmo del descenso, que ya frena en ese tramo. */
+      const esMovil = window.matchMedia('(max-width: 900px)').matches
+      if (!reduce && !esMovil) {
         ScrollTrigger.create({
-          trigger: '.risk', start: 'top top', end: '+=110%', pin: '.risk-pin', pinSpacing: true,
+          trigger: '.risk',
+          start: 'top top',
+          end: '+=110%',
+          pin: '.risk-pin',
+          pinSpacing: true,
+          anticipatePin: 1,
         })
       }
 
